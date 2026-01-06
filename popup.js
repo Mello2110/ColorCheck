@@ -304,28 +304,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // === MANUAL TRIGGER ===
 
   async function triggerMode(mode) {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-    if (!tab || !tab.id || tab.url.startsWith('chrome://') || tab.url.startsWith('edge://') || tab.url.startsWith('opera://') || tab.url.startsWith('about:')) {
-      showToast('Cannot identify colors on this page', '#ff0000');
-      return;
-    }
-
     try {
-      // Inject content script if not present
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['content.js']
-      }).catch(() => { }); // Ignore error if already injected
+      // Send message to background script to handle everything
+      // Background will capture screenshot and inject content script
+      chrome.runtime.sendMessage({
+        action: 'startPickerFromPopup',
+        mode: mode
+      });
 
-      // Send command
-      await chrome.tabs.sendMessage(tab.id, { action: 'activate', mode });
-
-      // Close popup
+      // Close popup immediately
       window.close();
+
     } catch (error) {
-      console.error('Trigger error:', error);
-      showToast('Failed to start. Refresh page?', '#ff0000');
+      console.error('ColorCheck trigger error:', error);
+      showToast('Error starting picker', '#ff0000');
     }
   }
 });

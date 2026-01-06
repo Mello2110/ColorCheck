@@ -36,17 +36,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Theme toggle
         themeToggle.addEventListener('click', toggleTheme);
 
-        // Chrome shortcuts link
+        // Chrome shortcuts link - copy URL to clipboard
         chromeShortcuts.addEventListener('click', (e) => {
             e.preventDefault();
-            // Note: This won't work directly, user needs to manually navigate
-            showToast('Open chrome://extensions/shortcuts in a new tab');
+            navigator.clipboard.writeText('chrome://extensions/shortcuts').then(() => {
+                showToast('URL copied! Paste in address bar');
+            });
         });
 
-        // Opera shortcuts link
+        // Opera shortcuts link - copy URL to clipboard
         operaShortcuts.addEventListener('click', (e) => {
             e.preventDefault();
-            showToast('Open opera://extensions/shortcuts in a new tab');
+            navigator.clipboard.writeText('opera://extensions/shortcuts').then(() => {
+                showToast('URL copied! Paste in address bar');
+            });
         });
 
         // Export favorites
