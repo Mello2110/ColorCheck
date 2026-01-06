@@ -11,9 +11,13 @@ chrome.commands.onCommand.addListener(async (command) => {
     let mode = command === 'toggle-eyedropper' ? 'eyedropper' : 'palette';
 
     if (command === 'toggle-palette') {
-      const result = await chrome.storage.local.get(['activeMode']);
-      if (result.activeMode === 'accent') {
-        mode = 'accent';
+      try {
+        const result = await chrome.storage.local.get(['activeMode']);
+        if (result.activeMode === 'accent') {
+          mode = 'accent';
+        }
+      } catch (e) {
+        console.warn('Failed to read mode, defaulting to palette', e);
       }
     }
 

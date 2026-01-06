@@ -3,8 +3,8 @@
 
 (function () {
     // Prevent multiple injections
-    if (window.__colorCheckInstalled) return;
-    window.__colorCheckInstalled = true;
+    // if (window.__colorCheckInstalled) return;
+    // window.__colorCheckInstalled = true;
 
     let mode = null;
     let screenshot = null;
@@ -636,7 +636,10 @@
                 const key = `${binR},${binG},${binB}`;
 
                 if (!colorMap.has(key)) {
-                    colorMap.set(key, { count: 0, r: 0, g: 0, b: 0, samples: 0 });
+                    colorMap.set(key, {
+                        count: 0, r: 0, g: 0, b: 0, samples: 0,
+                        maxSat: -1, vividR: 0, vividG: 0, vividB: 0
+                    });
                 }
                 const entry = colorMap.get(key);
                 entry.count++;
