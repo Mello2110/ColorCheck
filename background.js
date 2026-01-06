@@ -3,72 +3,55 @@
 
 // Command handler for keyboard shortcuts
 chrome.commands.onCommand.addListener(async (command) => {
-  console.log('[ColorCheck] Command received:', command);
-
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    console.log('[ColorCheck] Active tab:', tab?.url);
 
-    if (!tab || !tab.id) {
-      console.error('[ColorCheck] No active tab');
-      return;
-    }
+    if (!tab || !tab.id) return;
 
     const mode = command === 'toggle-eyedropper' ? 'eyedropper' : 'palette';
 
     await startColorPicker(tab.id, mode);
   } catch (error) {
-    console.error('[ColorCheck] Command error:', error);
-    showNotification('ColorCheck error: ' + error.message);
+    console.error('ColorCheck error:', error);
   }
 });
 
 // Main function to start color picker
 async function startColorPicker(tabId, mode) {
-  console.log('[ColorCheck] Starting picker, tabId:', tabId, 'mode:', mode);
-
   try {
     // Step 1: Capture visible tab as image
-    console.log('[ColorCheck] Capturing screenshot...');
     const screenshotUrl = await chrome.tabs.captureVisibleTab(null, {
       format: 'png',
       quality: 100
     });
-    console.log('[ColorCheck] Screenshot captured, length:', screenshotUrl?.length);
 
     // Step 2: Inject content script
-    console.log('[ColorCheck] Injecting content script...');
     try {
       await chrome.scripting.executeScript({
         target: { tabId: tabId },
         files: ['content.js']
       });
-      console.log('[ColorCheck] Content script injected');
     } catch (injectError) {
-      console.log('[ColorCheck] Content script may already be injected:', injectError.message);
+      // Script may already be injected
     }
 
     // Step 3: Small delay for script initialization
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Step 4: Send screenshot and mode to content script
-    console.log('[ColorCheck] Sending message to content script...');
-    const response = await chrome.tabs.sendMessage(tabId, {
+    await chrome.tabs.sendMessage(tabId, {
       action: 'startPicker',
       mode: mode,
       screenshot: screenshotUrl
     });
-    console.log('[ColorCheck] Content script response:', response);
 
   } catch (error) {
-    console.error('[ColorCheck] startColorPicker error:', error);
-    throw error;
+    console.error('ColorCheck picker error:', error);
   }
 }
 
 // Show a toast notification via content script
 async function showNotification(message) {
-  console.log('[ColorCheck] Showing notification:', message);
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab && tab.id) {
@@ -98,14 +81,12 @@ async function showNotification(message) {
       });
     }
   } catch (e) {
-    console.error('[ColorCheck] Cannot show notification:', e);
+    // Silent fail
   }
 }
 
 // Listen for messages from popup to start picker
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('[ColorCheck] Message received:', message.action);
-
   if (message.action === 'startPickerFromPopup') {
     (async () => {
       try {
@@ -113,22 +94,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         await new Promise(resolve => setTimeout(resolve, 200));
 
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        console.log('[ColorCheck] Tab for popup trigger:', tab?.url);
-
         if (tab && tab.id) {
           await startColorPicker(tab.id, message.mode);
           sendResponse({ success: true });
         } else {
-          console.error('[ColorCheck] No active tab for popup trigger');
           sendResponse({ success: false, error: 'No active tab' });
         }
       } catch (error) {
-        console.error('[ColorCheck] Picker error:', error);
-        showNotification('Error: ' + error.message);
+        console.error('ColorCheck picker error:', error);
         sendResponse({ success: false, error: error.message });
       }
     })();
-    return true; // Keep channel open for async response
+    return true;
   }
 
   if (message.action === 'storeColors') {
@@ -143,7 +120,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.storage.session.get(['colorHistory'], (result) => {
       let history = result.colorHistory || [];
       history.unshift(message.color);
-      history = history.slice(0, 10);
+      history = history.slice(0, 20); // Keep only 20 recent
       chrome.storage.session.set({ colorHistory: history });
     });
     sendResponse({ success: true });
@@ -151,6 +128,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   return true;
 });
-
-// Log when service worker starts
-console.log('[ColorCheck] Background service worker started');

@@ -30,7 +30,36 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadFormat();
         await loadFavorites();
         await loadHistory();
+        await loadShortcuts();
         setupEventListeners();
+    }
+
+    async function loadShortcuts() {
+        try {
+            const commands = await chrome.commands.getAll();
+            const eyedropperEl = document.getElementById('eyedropperShortcut');
+            const paletteEl = document.getElementById('paletteShortcut');
+
+            commands.forEach(cmd => {
+                if (cmd.name === 'toggle-eyedropper' && eyedropperEl) {
+                    eyedropperEl.innerHTML = formatShortcut(cmd.shortcut);
+                }
+                if (cmd.name === 'toggle-palette' && paletteEl) {
+                    paletteEl.innerHTML = formatShortcut(cmd.shortcut);
+                }
+            });
+        } catch (e) {
+            console.error('Failed to load shortcuts:', e);
+        }
+    }
+
+    function formatShortcut(shortcut) {
+        if (!shortcut) {
+            return '<span class="shortcut-not-set">Not set</span>';
+        }
+        // Split by + and wrap each key in kbd
+        const keys = shortcut.split('+').map(key => key.trim());
+        return keys.map(key => `<kbd>${key}</kbd>`).join(' + ');
     }
 
     function setupEventListeners() {
@@ -95,6 +124,15 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             chrome.tabs.create({ url: LANDING_URL });
         });
+
+        // Brand logo link
+        const brandLogoLink = document.getElementById('brandLogoLink');
+        if (brandLogoLink) {
+            brandLogoLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                chrome.tabs.create({ url: LANDING_URL });
+            });
+        }
     }
 
     // === THEME ===
@@ -238,38 +276,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderHistory(history) {
         if (history.length === 0) {
-            historyList.innerHTML = '<p class="empty-state">No colors in history. Use Alt+C or Alt+P to pick colors.</p>';
+            historyList.innerHTML = '<p class="empty-state">No colors in history. Use Alt+PageUp to pick colors.</p>';
             return;
         }
 
-        historyList.innerHTML = history.slice(0, 10).map(color => `
-      <div class="history-row" data-hex="${color.hex}" data-rgb="${color.rgb}" data-hsl="${color.hsl}">
-        <div class="history-color" style="background: ${color.hex}"></div>
-        <div class="history-values">
-          <span>${color.hex}</span>
-          <span>${color.rgb}</span>
-          <span>${color.hsl}</span>
+        historyList.innerHTML = history.slice(0, 12).map((color, index) => `
+      <div class="favorite-item history-item" data-index="${index}" data-hex="${color.hex}" data-rgb="${color.rgb}" data-hsl="${color.hsl}">
+        <div class="favorite-color" style="background: ${color.hex}"></div>
+        <span class="favorite-value">${getFormattedValue(color)}</span>
+        <div class="favorite-actions">
+          <button class="icon-btn add-to-fav" title="Add to favorites">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </button>
+          <button class="icon-btn copy-hist" title="Copy">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+            </svg>
+          </button>
+          <button class="icon-btn remove-hist" title="Remove from history">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
       </div>
     `).join('');
 
-        // Click to copy, right-click to add to favorites
-        historyList.querySelectorAll('.history-row').forEach(row => {
-            row.addEventListener('click', () => {
-                const value = row.dataset[currentFormat];
-                copyToClipboard(value, row.dataset.hex);
+        // Event listeners for history items
+        historyList.querySelectorAll('.history-item').forEach(item => {
+            const index = parseInt(item.dataset.index);
+            const colorData = {
+                hex: item.dataset.hex,
+                rgb: item.dataset.rgb,
+                hsl: item.dataset.hsl
+            };
+
+            item.querySelector('.copy-hist').addEventListener('click', (e) => {
+                e.stopPropagation();
+                copyToClipboard(getFormattedValue(colorData), colorData.hex);
             });
 
-            row.addEventListener('contextmenu', async (e) => {
-                e.preventDefault();
+            item.querySelector('.add-to-fav').addEventListener('click', async (e) => {
+                e.stopPropagation();
                 const result = await chrome.storage.local.get(['favorites']);
                 let favorites = result.favorites || [];
-
-                const colorData = {
-                    hex: row.dataset.hex,
-                    rgb: row.dataset.rgb,
-                    hsl: row.dataset.hsl
-                };
 
                 if (favorites.some(f => f.hex === colorData.hex)) {
                     showToast('Already in favorites');
@@ -283,7 +337,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 favorites.push({ ...colorData, timestamp: Date.now() });
                 await chrome.storage.local.set({ favorites });
+                loadFavorites();
                 showToast('Added to favorites (' + favorites.length + '/' + MAX_FAVORITES + ')', colorData.hex);
+            });
+
+            item.querySelector('.remove-hist').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const result = await chrome.storage.session.get(['colorHistory']);
+                let historyData = result.colorHistory || [];
+                historyData.splice(index, 1);
+                await chrome.storage.session.set({ colorHistory: historyData });
+                renderHistory(historyData);
+                showToast('Removed from history');
+            });
+
+            // Click on item to copy
+            item.addEventListener('click', () => {
+                copyToClipboard(getFormattedValue(colorData), colorData.hex);
             });
         });
     }

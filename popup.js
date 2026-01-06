@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const MAX_FAVORITES = 50;
 
   // DOM Elements
-  const formatBtns = document.querySelectorAll('.format-btn');
   const primarySwatch = document.getElementById('primarySwatch');
   const baseSwatch = document.getElementById('baseSwatch');
   const accentSwatch = document.getElementById('accentSwatch');
@@ -20,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.getElementById('themeToggle');
   const settingsBtn = document.getElementById('openSettings');
   const coffeeBtn = document.getElementById('coffeeBtn');
-  const landingBtn = document.getElementById('landingBtn');
   const startEyedropperBtn = document.getElementById('startEyedropper');
   const startPaletteBtn = document.getElementById('startPalette');
 
@@ -29,24 +27,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function init() {
     await loadTheme();
+    await loadFormat();
     await loadColors();
     await loadHistory();
     await loadFavorites();
+    await loadShortcuts();
     setupEventListeners();
   }
 
-  function setupEventListeners() {
-    // Format toggle
-    formatBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        formatBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFormat = btn.dataset.format;
-        updateDisplay();
-        updateHistoryDisplay();
-      });
-    });
+  async function loadShortcuts() {
+    try {
+      const commands = await chrome.commands.getAll();
+      const eyedropperEl = document.getElementById('popupEyedropperShortcut');
+      const paletteEl = document.getElementById('popupPaletteShortcut');
 
+      commands.forEach(cmd => {
+        if (cmd.name === 'toggle-eyedropper' && eyedropperEl) {
+          eyedropperEl.innerHTML = formatShortcutCompact(cmd.shortcut, 'Pick');
+        }
+        if (cmd.name === 'toggle-palette' && paletteEl) {
+          paletteEl.innerHTML = formatShortcutCompact(cmd.shortcut, 'Palette');
+        }
+      });
+    } catch (e) {
+      console.error('Failed to load shortcuts:', e);
+    }
+  }
+
+  function formatShortcutCompact(shortcut, label) {
+    if (!shortcut) {
+      return `<span class="shortcut-not-set">No shortcut</span> ${label}`;
+    }
+    const keys = shortcut.split('+').map(key => key.trim());
+    const formatted = keys.map(key => `<kbd>${key}</kbd>`).join('+');
+    return `${formatted} ${label}`;
+  }
+
+  async function loadFormat() {
+    const result = await chrome.storage.local.get(['defaultFormat']);
+    currentFormat = result.defaultFormat || 'hex';
+  }
+
+  function setupEventListeners() {
     // Theme toggle
     themeToggle.addEventListener('click', toggleTheme);
 
@@ -59,11 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
     coffeeBtn.addEventListener('click', (e) => {
       e.preventDefault();
       chrome.tabs.create({ url: COFFEE_URL });
-    });
-
-    landingBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: LANDING_URL });
     });
 
     // Manual Triggers
@@ -186,32 +203,95 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    historyList.innerHTML = history.slice(0, 10).map(color => `
-      <div class="history-item" 
-           style="background: ${color.hex}" 
+    historyList.innerHTML = history.slice(0, 3).map((color, index) => `
+      <div class="swatch history-swatch" 
            data-hex="${color.hex}"
            data-rgb="${color.rgb}"
            data-hsl="${color.hsl}"
-           title="Click: copy | Right-click: add to favorites">
+           data-index="${index}">
+        <div class="swatch-color" style="background: ${color.hex}"></div>
+        <div class="swatch-info">
+          <span class="swatch-value">${getFormattedHistoryValue(color)}</span>
+        </div>
+        <button class="icon-btn history-fav-btn" title="Add to favorites">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </button>
+        <button class="icon-btn history-copy-btn" title="Copy">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+          </svg>
+        </button>
+        <button class="icon-btn history-delete-btn" title="Remove from history">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
     `).join('');
 
-    // Click to copy, right-click to add to favorites
-    historyList.querySelectorAll('.history-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const value = item.dataset[currentFormat];
-        copyToClipboard(value, item);
+    // Set up event listeners for history items
+    historyList.querySelectorAll('.history-swatch').forEach(swatch => {
+      const colorData = {
+        hex: swatch.dataset.hex,
+        rgb: swatch.dataset.rgb,
+        hsl: swatch.dataset.hsl
+      };
+      const index = parseInt(swatch.dataset.index);
+
+      // Copy button
+      swatch.querySelector('.history-copy-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const value = getFormattedHistoryValue(colorData);
+        copyToClipboard(value, swatch);
       });
 
-      item.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        const colorData = {
-          hex: item.dataset.hex,
-          rgb: item.dataset.rgb,
-          hsl: item.dataset.hsl
-        };
+      // Favorite button
+      swatch.querySelector('.history-fav-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
         addToFavorites(colorData);
       });
+
+      // Delete button
+      swatch.querySelector('.history-delete-btn').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const result = await chrome.storage.session.get(['colorHistory']);
+        let historyData = result.colorHistory || [];
+        historyData.splice(index, 1);
+        await chrome.storage.session.set({ colorHistory: historyData });
+        renderHistory(historyData);
+        showToast('Removed from history');
+      });
+
+      // Click on swatch color to copy
+      swatch.querySelector('.swatch-color').addEventListener('click', () => {
+        const value = getFormattedHistoryValue(colorData);
+        copyToClipboard(value, swatch);
+      });
+    });
+
+    updateHistoryFavoriteButtons();
+  }
+
+  function getFormattedHistoryValue(colorData) {
+    switch (currentFormat) {
+      case 'rgb': return colorData.rgb;
+      case 'hsl': return colorData.hsl;
+      default: return colorData.hex;
+    }
+  }
+
+  function updateHistoryFavoriteButtons() {
+    historyList.querySelectorAll('.history-fav-btn').forEach(btn => {
+      const swatch = btn.closest('.history-swatch');
+      if (swatch && favorites.some(f => f.hex === swatch.dataset.hex)) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
     });
   }
 

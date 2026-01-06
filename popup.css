@@ -105,55 +105,75 @@
   gap: 8px;
 }
 
-/* History Grid */
+/* History Section - Matches Palette Style */
 .history-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.history-swatch {
+  display: flex;
+  align-items: center;
   gap: 8px;
-}
-
-.history-item {
-  aspect-ratio: 1;
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--border-color);
-  cursor: pointer;
+  padding: 6px 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   transition: all var(--transition-fast);
-  position: relative;
 }
 
-.history-item:hover {
-  transform: scale(1.1);
+.history-swatch:hover {
   border-color: var(--cc-cyan);
-  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
-  z-index: 1;
-}
-
-.history-item::after {
-  content: attr(data-hex);
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
   background: var(--bg-secondary);
-  color: var(--text-primary);
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  font-size: 0.65rem;
-  font-family: monospace;
-  white-space: nowrap;
-  box-shadow: var(--shadow-md);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-fast);
-  z-index: 10;
 }
 
-.history-item:hover::after {
+.history-swatch .swatch-color {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.history-swatch .swatch-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-swatch .swatch-value {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-swatch .icon-btn {
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  opacity: 0.5;
+}
+
+.history-swatch:hover .icon-btn {
   opacity: 1;
 }
 
+.history-swatch .history-fav-btn.active svg {
+  fill: var(--cc-orange);
+  stroke: var(--cc-orange);
+}
+
+.history-swatch .history-delete-btn:hover svg {
+  stroke: #ff4444;
+}
+
 .empty-state {
-  grid-column: 1 / -1;
   text-align: center;
   color: var(--text-muted);
   font-size: 0.75rem;
@@ -177,17 +197,55 @@
   gap: 4px;
 }
 
+.shortcut-not-set {
+  color: var(--cc-orange);
+  font-style: italic;
+}
+
 /* Footer */
 .footer {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
   padding-top: 8px;
 }
 
-.footer .btn {
-  flex: 1;
-  padding: 10px 12px;
-  font-size: 0.65rem;
+.coffee-btn {
+  color: var(--cc-orange);
+  transition: all var(--transition-fast);
+}
+
+.coffee-btn:hover {
+  color: #ffaa00;
+  transform: scale(1.1);
+}
+
+/* Brand Footer */
+.brand-footer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast);
+}
+
+.brand-footer:hover {
+  opacity: 0.8;
+}
+
+.brand-footer span {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.brand-logo {
+  width: 50px;
+  height: auto;
+}
+
+.coffee-btn:hover {
+  color: #ffaa00;
+  transform: scale(1.1);
 }
 
 /* Copied Animation */

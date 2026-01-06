@@ -156,6 +156,18 @@
     text-decoration: underline;
 }
 
+.shortcut-loading {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-style: italic;
+}
+
+.shortcut-not-set {
+    color: var(--cc-orange);
+    font-size: 0.75rem;
+    font-style: italic;
+}
+
 /* Favorites Grid */
 .favorites-grid {
     display: grid;
@@ -325,6 +337,47 @@
     gap: 12px;
     justify-content: center;
     margin-top: 16px;
+}
+
+/* Brand Section */
+.brand-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto;
+    padding: 20px 32px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    opacity: 0.85;
+    transition: all var(--transition-fast);
+}
+
+.brand-section:hover {
+    opacity: 1;
+    border-color: var(--cc-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
+
+.brand-logo-link {
+    display: block;
+    transition: transform var(--transition-fast);
+}
+
+.brand-logo-link:hover {
+    transform: scale(1.05);
+}
+
+.brand-logo-large {
+    width: 80px;
+    height: auto;
+}
+
+.brand-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: var(--letter-spacing);
 }
 
 /* Empty State */

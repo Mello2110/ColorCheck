@@ -45,8 +45,8 @@
                             <span class="shortcut-name">Eyedropper Mode</span>
                             <span class="shortcut-desc">Pick a single color from the page</span>
                         </div>
-                        <div class="shortcut-keys">
-                            <kbd>Alt</kbd> + <kbd>PageUp</kbd>
+                        <div class="shortcut-keys" id="eyedropperShortcut">
+                            <span class="shortcut-loading">Loading...</span>
                         </div>
                     </div>
                     <div class="shortcut-row">
@@ -54,8 +54,8 @@
                             <span class="shortcut-name">Palette Mode</span>
                             <span class="shortcut-desc">Extract 3-color palette from selection</span>
                         </div>
-                        <div class="shortcut-keys">
-                            <kbd>Alt</kbd> + <kbd>PageDown</kbd>
+                        <div class="shortcut-keys" id="paletteShortcut">
+                            <span class="shortcut-loading">Loading...</span>
                         </div>
                     </div>
                     <p class="shortcut-note">
@@ -116,7 +116,7 @@
                     </button>
                 </div>
                 <div class="card-content">
-                    <div class="history-list" id="historyList">
+                    <div class="favorites-grid" id="historyList">
                         <p class="empty-state">No colors in history</p>
                     </div>
                 </div>
@@ -161,8 +161,14 @@
                     <h2>About</h2>
                 </div>
                 <div class="card-content about-content">
-                    <p>ColorCheck v2.0.0</p>
+                    <p>ColorCheck v2.1.0</p>
                     <p class="about-desc">Eyedropper and palette extractor for web designers</p>
+                    <div class="brand-section">
+                        <a href="#" id="brandLogoLink" class="brand-logo-link" title="Visit Mellow Solutions">
+                            <img src="icons/mellow-logo.png" alt="Mellow Solutions" class="brand-logo-large">
+                        </a>
+                        <span class="brand-text">by Mellow Solutions</span>
+                    </div>
                     <div class="about-links">
                         <a href="#" class="btn btn-coffee" id="coffeeBtn">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
