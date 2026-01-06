@@ -646,23 +646,50 @@
                 entry.g += color.g;
                 entry.b += color.b;
                 entry.samples++;
+
+                // Check saturation for vivid representative
+                // Quick approx saturation using the current pixel color
+                const max = Math.max(color.r, color.g, color.b);
+                const min = Math.min(color.r, color.g, color.b);
+                const sat = max === 0 ? 0 : (max - min) / max;
+
+                if (sat > entry.maxSat) {
+                    entry.maxSat = sat;
+                    entry.vividR = color.r;
+                    entry.vividG = color.g;
+                    entry.vividB = color.b;
+                }
             }
         }
 
-        // 2. Convert buckets to centroids (clusters)
-        let clusters = [...colorMap.values()].map(c => ({
-            r: Math.round(c.r / c.samples),
-            g: Math.round(c.g / c.samples),
-            b: Math.round(c.b / c.samples),
-            count: c.count,
-            hsl: rgbToHsl(Math.round(c.r / c.samples), Math.round(c.g / c.samples), Math.round(c.b / c.samples))
-        }));
+        // 2. Convert buckets to centroids
+        let clusters = [...colorMap.values()].map(c => {
+            // Average color (for Base)
+            const avgR = Math.round(c.r / c.samples);
+            const avgG = Math.round(c.g / c.samples);
+            const avgB = Math.round(c.b / c.samples);
+
+            // Vivid color (for Accents)
+            // If cluster didn't record a vivid color (shouldn't happen), fall back to average
+            const vividR = c.vividR !== undefined ? c.vividR : avgR;
+            const vividG = c.vividG !== undefined ? c.vividG : avgG;
+            const vividB = c.vividB !== undefined ? c.vividB : avgB;
+
+            const vividHsl = rgbToHsl(vividR, vividG, vividB);
+
+            return {
+                r: avgR, g: avgG, b: avgB, // Default RGB is average
+                vivid: { r: vividR, g: vividG, b: vividB, hsl: vividHsl },
+                count: c.count,
+                hsl: rgbToHsl(avgR, avgG, avgB) // Average HSL
+            };
+        });
 
         // Filter out tiny noise clusters (< 0.5% of max cluster)
         const maxCount = Math.max(...clusters.map(c => c.count));
         clusters = clusters.filter(c => c.count > maxCount * 0.005);
 
-        // 3. Compute Global Statistics (Weighted)
+        // 3. Compute Global Statistics (Weighted by Average colors)
         let totalPixels = 0;
         let weightedSat = 0;
         let weightedLight = 0;
@@ -676,10 +703,10 @@
         const globalAvgSaturation = totalPixels > 0 ? weightedSat / totalPixels : 0;
         const globalAvgLightness = totalPixels > 0 ? weightedLight / totalPixels : 50;
 
-        // 4. Calculate Saliency Score for Accents
+        // 4. Calculate Saliency Score (Using VIVID color)
         for (const c of clusters) {
-            const saturationComponent = Math.max(0, c.hsl.s - globalAvgSaturation);
-            const lightnessContrast = Math.abs(c.hsl.l - globalAvgLightness);
+            const saturationComponent = Math.max(0, c.vivid.hsl.s - globalAvgSaturation);
+            const lightnessContrast = Math.abs(c.vivid.hsl.l - globalAvgLightness);
             const frequencyComponent = Math.log(1 + c.count);
 
             // Weighted Saliency Score
@@ -689,17 +716,17 @@
         // Sort candidates by Saliency (Descending)
         clusters.sort((a, b) => b.saliencyScore - a.saliencyScore);
 
-        // 3. Select 3 distinct Accents
+        // 5. Select 3 distinct Accents
         const accents = [];
-        const minDistance = 30; // Min distance in RGB space to be "distinct"
+        const minDistance = 35;
 
         for (const cluster of clusters) {
             if (accents.length >= 3) break;
 
-            // Check if distinct enough from already picked accents
             let isDistinct = true;
             for (const picked of accents) {
-                if (getColorDistance(cluster, picked) < minDistance) {
+                // Compare Vivid colors for distinctness
+                if (getColorDistance(cluster.vivid, picked.vivid) < minDistance) {
                     isDistinct = false;
                     break;
                 }
@@ -710,29 +737,27 @@
             }
         }
 
-        // Fill with default if not enough distinct colors found
+        // Fallback
         while (accents.length < 3) {
-            // Find next most frequent even if similar, or duplicate
-            accents.push(accents[0] || { r: 0, g: 0, b: 0, hsl: { h: 0, s: 0, l: 0 } });
+            accents.push(clusters.shift() || { r: 128, g: 128, b: 128, hsl: { h: 0, s: 0, l: 50 }, vivid: { r: 128, g: 128, b: 128, hsl: { h: 0, s: 0, l: 50 } } });
         }
 
-        // 6. Select Base (Background)
+        // 6. Select Base (Background) - Using AVERAGE color
         let base = null;
         let bestBaseScore = -Infinity;
 
-        // Re-iterate (we need to find best background, which might have low saliency)
         for (const c of clusters) {
-            // Don't pick a color that is already an accent
             let isUsed = false;
             for (const acc of accents) {
-                if (getColorDistance(c, acc) < 20) isUsed = true;
+                // Check if Average color is close to any Vivid Accent
+                if (getColorDistance(c, acc.vivid) < 20) isUsed = true;
             }
             if (isUsed) continue;
 
             const countFactor = Math.log(1 + c.count);
+            // Prefer lower saturation average
             const lowSatFactor = (100 - c.hsl.s);
 
-            // Base Score: Frequency is very important for background
             const score = (countFactor * 3.0) + (lowSatFactor * 1.5);
 
             if (score > bestBaseScore) {
@@ -744,10 +769,10 @@
         if (!base) base = accents[0];
 
         return {
-            primary: formatColor(accents[0]), // UI Label: Accent 1
-            base: formatColor(base),         // UI Label: Base
-            accent: formatColor(accents[1]), // UI Label: Accent 2
-            accent2: formatColor(accents[2]) // UI Label: Accent 3
+            primary: formatColor(accents[0].vivid), // Accent 1 (Vivid)
+            base: formatColor(base),                // Base (Average)
+            accent: formatColor(accents[1].vivid),  // Accent 2 (Vivid)
+            accent2: formatColor(accents[2].vivid)  // Accent 3 (Vivid)
         };
     }
 
