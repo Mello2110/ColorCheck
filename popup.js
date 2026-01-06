@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     await loadColors();
     await loadHistory();
     await loadFavorites();
-    await loadShortcuts();
     setupEventListeners();
   }
 

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorCheck - Privacy & Terms</title>
+    <link rel="stylesheet" href="design.css">
+    <style>
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            background: var(--bg-secondary);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            background: var(--cc-gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--cc-cyan);
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .heart {
+            color: #ff4444;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--cc-cyan);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="#" class="back-link" id="closeBtn">← Back</a>
+
+        <h1>Privacy & Heartfelt Terms</h1>
+
+        <h2>We're Just Happy You're Here</h2>
+        <p>
+            We built <strong>ColorCheck</strong> with a simple goal: to make your design workflow smoother and a little
+            more colorful. We are absolutely thrilled that you've chosen to use it! Whether you're fixing a personal
+            project, studying design, or building the next big thing, we hope this tool simplifies your life.
+        </p>
+
+        <h2>For Our Corporate Friends</h2>
+        <p>
+            Yes, companies and enterprises are more than welcome to use ColorCheck! If our extension helps your business
+            shine, we kindly ask for a <strong>friendly mention</strong> where appropriate. It's not a strict rule, just
+            a request—spreading the word helps us keep the lights on and the colors bright for everyone.
+        </p>
+
+        <h2>Support the Craft</h2>
+        <p>
+            ColorCheck is free to use, and we intend to keep it that way. However, if you find it indispensable and want
+            to show some love, we’d be over the moon if you considered a donation <span class="heart">❤</span>. It keeps
+            the coffee brewing and the updates coming.
+        </p>
+
+        <h2>Your Data Stays Yours</h2>
+        <p>
+            Technically speaking: We do not collect, store, track, or sell your personal data. Your hex codes, history,
+            and palettes live on your device and nowhere else. It's your creativity, we just provide the eyedropper.
+        </p>
+
+        <div class="footer">
+            <p>with love by Mellow Solutions</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('closeBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.close();
+        });
+    </script>
+</body>
+
+</html>

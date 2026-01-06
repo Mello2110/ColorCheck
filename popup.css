@@ -1,12 +1,11 @@
-/* ColorCheck Popup Styles */
+/* ColorCheck Popup Styles - Compact Layout */
 
 .popup-container {
-  width: 320px;
-  min-height: 400px;
-  padding: 16px;
+  width: 300px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 /* Header */
@@ -19,106 +18,116 @@
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .header-logo {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
 }
 
 .header h1 {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   margin: 0;
 }
 
 .header-actions {
   display: flex;
-  gap: 4px;
+  gap: 2px;
 }
 
-/* Format Toggle */
-.format-toggle {
-  display: flex;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-md);
-  padding: 4px;
-  gap: 4px;
+.header-actions .icon-btn {
+  width: 28px;
+  height: 28px;
+  padding: 6px;
 }
 
-.format-btn {
-  flex: 1;
-  padding: 8px 12px;
-  font-family: var(--font-family);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: var(--letter-spacing);
-  text-transform: uppercase;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
+.header-actions .coffee-btn {
+  color: var(--cc-orange);
 }
 
-.format-btn:hover {
-  color: var(--text-primary);
-}
-
-.format-btn.active {
-  background: var(--cc-gradient-primary);
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+.header-actions .coffee-btn:hover {
+  color: #ffaa00;
 }
 
 /* Manual Triggers */
 .manual-triggers {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 6px;
 }
 
 .trigger-btn {
   flex: 1;
-  padding: 12px;
-  font-size: 0.75rem;
+  padding: 8px;
+  font-size: 0.7rem;
   justify-content: center;
+}
+
+.trigger-btn svg {
+  width: 12px;
+  height: 12px;
 }
 
 /* Sections */
 .section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .section h2 {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
+  margin: 0;
 }
 
 /* Palette */
 .palette {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
-/* History Section - Matches Palette Style */
+.swatch {
+  padding: 5px 8px;
+  gap: 6px;
+}
+
+.swatch .swatch-color {
+  width: 26px;
+  height: 26px;
+}
+
+.swatch .swatch-info {
+  flex: 1;
+}
+
+.swatch .swatch-label {
+  font-size: 0.55rem;
+}
+
+.swatch .swatch-value {
+  font-size: 0.65rem;
+}
+
+.swatch .icon-btn {
+  width: 22px;
+  height: 22px;
+  padding: 4px;
+}
+
+/* History Section */
 .history-grid {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-height: 200px;
-  overflow-y: auto;
+  gap: 4px;
 }
 
 .history-swatch {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: 6px;
+  padding: 5px 8px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
@@ -131,12 +140,11 @@
 }
 
 .history-swatch .swatch-color {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
   flex-shrink: 0;
-  cursor: pointer;
 }
 
 .history-swatch .swatch-info {
@@ -145,7 +153,7 @@
 }
 
 .history-swatch .swatch-value {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-family: var(--font-mono);
   color: var(--text-primary);
   white-space: nowrap;
@@ -154,9 +162,9 @@
 }
 
 .history-swatch .icon-btn {
-  width: 24px;
-  height: 24px;
-  padding: 4px;
+  width: 20px;
+  height: 20px;
+  padding: 3px;
   opacity: 0.5;
 }
 
@@ -176,99 +184,36 @@
 .empty-state {
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.75rem;
-  padding: 16px;
-}
-
-/* Shortcuts */
-.shortcuts {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 8px 0;
-  border-top: 1px solid var(--border-color);
-}
-
-.shortcut {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.shortcut-not-set {
-  color: var(--cc-orange);
-  font-style: italic;
+  font-size: 0.7rem;
+  padding: 10px;
 }
 
 /* Footer */
 .footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding-top: 8px;
-}
-
-.coffee-btn {
-  color: var(--cc-orange);
-  transition: all var(--transition-fast);
-}
-
-.coffee-btn:hover {
-  color: #ffaa00;
-  transform: scale(1.1);
-}
-
-/* Brand Footer */
-.brand-footer {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  opacity: 0.5;
-  transition: opacity var(--transition-fast);
-}
-
-.brand-footer:hover {
-  opacity: 0.8;
-}
-
-.brand-footer span {
-  font-size: 0.6rem;
-  color: var(--text-muted);
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color);
 }
 
 .brand-link {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   color: var(--text-muted);
   text-decoration: none;
-  transition: color var(--transition-fast);
+  opacity: 0.6;
+  transition: all var(--transition-fast);
 }
 
 .brand-link:hover {
   color: var(--cc-cyan);
-}
-
-.brand-logo {
-  width: 50px;
-  height: auto;
-}
-
-.coffee-btn:hover {
-  color: #ffaa00;
-  transform: scale(1.1);
+  opacity: 1;
 }
 
 /* Copied Animation */
 .copy-btn.copied svg,
 .swatch.copied .copy-btn svg {
   stroke: #00D4FF;
-}
-
-.copy-btn.copied::after {
-  content: '✓';
-  position: absolute;
-  font-size: 10px;
 }
 
 /* Favorite Button States */
@@ -280,18 +225,18 @@
 /* Toast Notification */
 .toast {
   position: fixed;
-  bottom: 16px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-secondary);
   color: var(--text-primary);
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: var(--radius-md);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   box-shadow: var(--shadow-lg);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   z-index: 1000;
   animation: toastIn 0.3s ease, toastOut 0.3s ease 1.7s forwards;
 }
@@ -319,8 +264,8 @@
 }
 
 .toast-swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
   border: 1px solid var(--border-color);
 }
