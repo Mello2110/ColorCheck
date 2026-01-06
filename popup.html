@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ColorCheck</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>ColorCheck</h1>
+      <div class="format-toggle">
+        <button class="format-btn active" data-format="hex">HEX</button>
+        <button class="format-btn" data-format="rgb">RGB</button>
+        <button class="format-btn" data-format="hsl">HSL</button>
+      </div>
+    </header>
+
+    <section class="palette-section">
+      <h2>Current Palette</h2>
+      <div class="palette" id="currentPalette">
+        <div class="color-swatch" id="primarySwatch">
+          <div class="swatch-color"></div>
+          <div class="swatch-info">
+            <span class="swatch-label">Primary</span>
+            <span class="swatch-value">--</span>
+          </div>
+          <button class="copy-btn" title="Copy">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="color-swatch" id="baseSwatch">
+          <div class="swatch-color"></div>
+          <div class="swatch-info">
+            <span class="swatch-label">Base</span>
+            <span class="swatch-value">--</span>
+          </div>
+          <button class="copy-btn" title="Copy">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="color-swatch" id="accentSwatch">
+          <div class="swatch-color"></div>
+          <div class="swatch-info">
+            <span class="swatch-label">Accent</span>
+            <span class="swatch-value">--</span>
+          </div>
+          <button class="copy-btn" title="Copy">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="history-section">
+      <h2>Recent Colors</h2>
+      <div class="history-list" id="historyList">
+        <p class="empty-state">No colors picked yet</p>
+      </div>
+    </section>
+
+    <footer class="shortcuts">
+      <div class="shortcut"><kbd>Alt</kbd>+<kbd>C</kbd> Eyedropper</div>
+      <div class="shortcut"><kbd>Alt</kbd>+<kbd>P</kbd> Palette</div>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
