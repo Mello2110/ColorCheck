@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const primarySwatch = document.getElementById('primarySwatch');
   const baseSwatch = document.getElementById('baseSwatch');
   const accentSwatch = document.getElementById('accentSwatch');
+  const accent2Swatch = document.getElementById('accent2Swatch');
   const historyList = document.getElementById('historyList');
   const themeToggle = document.getElementById('themeToggle');
   const settingsBtn = document.getElementById('openSettings');
@@ -82,6 +83,15 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       chrome.tabs.create({ url: COFFEE_URL });
     });
+
+    // Brand link
+    const brandLink = document.getElementById('brandLinkPopup');
+    if (brandLink) {
+      brandLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({ url: LANDING_URL });
+      });
+    }
 
     // Manual Triggers
     startEyedropperBtn.addEventListener('click', () => triggerMode('eyedropper'));

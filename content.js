@@ -447,6 +447,10 @@
         const accentHsl = { h: (primaryHsl.h + 180) % 360, s: Math.min(80, primaryHsl.s + 20), l: Math.min(60, primaryHsl.l) };
         const accentRgb = hslToRgb(accentHsl.h, accentHsl.s, accentHsl.l);
 
+        // Accent 2: Triadic color (120 degrees from primary)
+        const accent2Hsl = { h: (primaryHsl.h + 120) % 360, s: Math.min(70, primaryHsl.s + 10), l: Math.min(55, primaryHsl.l + 5) };
+        const accent2Rgb = hslToRgb(accent2Hsl.h, accent2Hsl.s, accent2Hsl.l);
+
         return {
             primary: {
                 hex: rgbToHex(primary.r, primary.g, primary.b),
@@ -462,6 +466,11 @@
                 hex: rgbToHex(accentRgb.r, accentRgb.g, accentRgb.b),
                 rgb: `rgb(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b})`,
                 hsl: `hsl(${accentHsl.h}, ${accentHsl.s}%, ${accentHsl.l}%)`
+            },
+            accent2: {
+                hex: rgbToHex(accent2Rgb.r, accent2Rgb.g, accent2Rgb.b),
+                rgb: `rgb(${accent2Rgb.r}, ${accent2Rgb.g}, ${accent2Rgb.b})`,
+                hsl: `hsl(${accent2Hsl.h}, ${accent2Hsl.s}%, ${accent2Hsl.l}%)`
             }
         };
     }
