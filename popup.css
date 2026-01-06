@@ -76,9 +76,27 @@
   gap: 6px;
 }
 
-.section h2 {
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-header h2 {
   font-size: 0.6rem;
   margin: 0;
+}
+
+.section-header .icon-btn {
+  width: 16px;
+  height: 16px;
+  padding: 3px;
+  color: var(--text-muted);
+}
+
+.section-header .icon-btn:hover {
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
 }
 
 /* Palette */

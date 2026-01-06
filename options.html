@@ -35,43 +35,48 @@
         <main class="options-main">
             <!-- Keyboard Shortcuts -->
             <section class="card">
-                <div class="card-header">
-                    <h2>Keyboard Shortcuts</h2>
-                    <p class="card-description">Customize your color picking hotkeys</p>
-                </div>
-                <div class="card-content">
-                    <div class="shortcut-row">
-                        <div class="shortcut-info">
-                            <span class="shortcut-name">Eyedropper Mode</span>
-                            <span class="shortcut-desc">Pick a single color from the page</span>
-                        </div>
-                        <div class="shortcut-keys" id="eyedropperShortcut">
-                            <span class="shortcut-loading">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="shortcut-row">
-                        <div class="shortcut-info">
-                            <span class="shortcut-name">Palette Mode</span>
-                            <span class="shortcut-desc">Extract 3-color palette from selection</span>
-                        </div>
-                        <div class="shortcut-keys" id="paletteShortcut">
-                            <span class="shortcut-loading">Loading...</span>
-                        </div>
-                    </div>
-                    <p class="shortcut-note">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12" y2="8"></line>
+                <details>
+                    <summary class="card-header summary-header">
+                        <h2>Keyboard Shortcuts</h2>
+                        <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
-                        <span>
-                            Manage shortcuts:
-                            <a href="#" id="chromeShortcuts">Chrome</a> |
-                            <a href="#" id="operaShortcuts">Opera</a>
-                        </span>
-                    </p>
-                </div>
+                    </summary>
+                    <div class="card-content">
+                        <div class="shortcut-row">
+                            <div class="shortcut-info">
+                                <span class="shortcut-name">Eyedropper Mode</span>
+                                <span class="shortcut-desc">Pick a single color from the page</span>
+                            </div>
+                            <div class="shortcut-keys" id="eyedropperShortcut">
+                                <span class="shortcut-loading">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="shortcut-row">
+                            <div class="shortcut-info">
+                                <span class="shortcut-name">Palette Mode</span>
+                                <span class="shortcut-desc">Extract 3-color palette from selection</span>
+                            </div>
+                            <div class="shortcut-keys" id="paletteShortcut">
+                                <span class="shortcut-loading">Loading...</span>
+                            </div>
+                        </div>
+                        <p class="shortcut-note">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12" y2="8"></line>
+                            </svg>
+                            <span>
+                                Manage shortcuts:
+                                <a href="#" id="chromeShortcuts">Chrome</a> |
+                                <a href="#" id="operaShortcuts">Opera</a>
+                            </span>
+                        </p>
+                    </div>
+                </details>
             </section>
 
             <!-- Favorites -->
@@ -124,35 +129,40 @@
 
             <!-- Format Preference -->
             <section class="card">
-                <div class="card-header">
-                    <h2>Default Format</h2>
-                    <p class="card-description">Choose your preferred color format</p>
-                </div>
-                <div class="card-content">
-                    <div class="format-options">
-                        <label class="format-option">
-                            <input type="radio" name="format" value="hex" checked>
-                            <span class="format-label">
-                                <span class="format-name">HEX</span>
-                                <span class="format-example">#FF00AA</span>
-                            </span>
-                        </label>
-                        <label class="format-option">
-                            <input type="radio" name="format" value="rgb">
-                            <span class="format-label">
-                                <span class="format-name">RGB</span>
-                                <span class="format-example">rgb(255, 0, 170)</span>
-                            </span>
-                        </label>
-                        <label class="format-option">
-                            <input type="radio" name="format" value="hsl">
-                            <span class="format-label">
-                                <span class="format-name">HSL</span>
-                                <span class="format-example">hsl(320, 100%, 50%)</span>
-                            </span>
-                        </label>
+                <details>
+                    <summary class="card-header summary-header">
+                        <h2>Default Format</h2>
+                        <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </summary>
+                    <div class="card-content">
+                        <div class="format-options">
+                            <label class="format-option">
+                                <input type="radio" name="format" value="hex" checked>
+                                <span class="format-label">
+                                    <span class="format-name">HEX</span>
+                                    <span class="format-example">#FF00AA</span>
+                                </span>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="format" value="rgb">
+                                <span class="format-label">
+                                    <span class="format-name">RGB</span>
+                                    <span class="format-example">rgb(255, 0, 170)</span>
+                                </span>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="format" value="hsl">
+                                <span class="format-label">
+                                    <span class="format-name">HSL</span>
+                                    <span class="format-example">hsl(320, 100%, 50%)</span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
-                </div>
+                </details>
             </section>
 
             <!-- About -->

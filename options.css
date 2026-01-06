@@ -77,6 +77,38 @@
     color: var(--text-primary);
 }
 
+/* Details & Summary (Accordion) */
+details summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--bg-tertiary);
+    transition: background var(--transition-fast);
+}
+
+.summary-header:hover {
+    background: var(--bg-primary);
+}
+
+.dropdown-arrow {
+    transition: transform var(--transition-fast);
+    color: var(--text-muted);
+}
+
+details[open] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
 .card-description {
     font-size: 0.7rem;
     color: var(--text-muted);

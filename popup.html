@@ -65,7 +65,15 @@
 
     <!-- Current Palette -->
     <section class="section">
-      <h2>Palette</h2>
+      <div class="section-header">
+        <h2>Palette</h2>
+        <button class="icon-btn" id="clearPalette" title="Clear Palette">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+          </svg>
+        </button>
+      </div>
       <div class="palette" id="currentPalette">
         <div class="swatch" id="primarySwatch" data-role="primary">
           <div class="swatch-color"></div>
@@ -152,7 +160,15 @@
 
     <!-- Recent Colors -->
     <section class="section">
-      <h2>Recent</h2>
+      <div class="section-header">
+        <h2>Recent</h2>
+        <button class="icon-btn" id="clearRecent" title="Clear Recent">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+          </svg>
+        </button>
+      </div>
       <div class="history-grid" id="historyList">
         <p class="empty-state">No colors picked yet</p>
       </div>

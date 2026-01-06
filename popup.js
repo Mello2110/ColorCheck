@@ -108,6 +108,37 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Clear Palette
+    const clearPaletteBtn = document.getElementById('clearPalette');
+    if (clearPaletteBtn) {
+      clearPaletteBtn.addEventListener('click', async () => {
+        await chrome.storage.session.remove('currentColors');
+        currentColors = null;
+
+        // Reset UI manually since updateDisplay returns early on null
+        [primarySwatch, baseSwatch, accentSwatch, accent2Swatch].forEach(swatch => {
+          if (swatch) {
+            const colorDiv = swatch.querySelector('.swatch-color');
+            const valueSpan = swatch.querySelector('.swatch-value');
+            colorDiv.style.background = '';
+            valueSpan.textContent = '--';
+          }
+        });
+
+        showToast('Palette cleared');
+      });
+    }
+
+    // Clear Recent
+    const clearRecentBtn = document.getElementById('clearRecent');
+    if (clearRecentBtn) {
+      clearRecentBtn.addEventListener('click', async () => {
+        await chrome.storage.session.remove('colorHistory');
+        renderHistory([]);
+        showToast('Recent history cleared');
+      });
+    }
+
     // Favorite buttons
     document.querySelectorAll('.favorite-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -179,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSwatch(primarySwatch, currentColors.primary);
     updateSwatch(baseSwatch, currentColors.base);
     updateSwatch(accentSwatch, currentColors.accent);
+    updateSwatch(accent2Swatch, currentColors.accent2);
     updateFavoriteButtons();
   }
 

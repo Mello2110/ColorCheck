@@ -66,20 +66,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Theme toggle
         themeToggle.addEventListener('click', toggleTheme);
 
-        // Chrome shortcuts link - copy URL to clipboard
+        // Chrome shortcuts link - open in new tab
         chromeShortcuts.addEventListener('click', (e) => {
             e.preventDefault();
-            navigator.clipboard.writeText('chrome://extensions/shortcuts').then(() => {
-                showToast('URL copied! Paste in address bar');
-            });
+            chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
         });
 
-        // Opera shortcuts link - copy URL to clipboard
+        // Opera shortcuts link - open in new tab
         operaShortcuts.addEventListener('click', (e) => {
             e.preventDefault();
-            navigator.clipboard.writeText('opera://extensions/shortcuts').then(() => {
-                showToast('URL copied! Paste in address bar');
-            });
+            chrome.tabs.create({ url: 'opera://extensions/shortcuts' });
         });
 
         // Export favorites
