@@ -8,7 +8,14 @@ chrome.commands.onCommand.addListener(async (command) => {
 
     if (!tab || !tab.id) return;
 
-    const mode = command === 'toggle-eyedropper' ? 'eyedropper' : 'palette';
+    let mode = command === 'toggle-eyedropper' ? 'eyedropper' : 'palette';
+
+    if (command === 'toggle-palette') {
+      const result = await chrome.storage.local.get(['activeMode']);
+      if (result.activeMode === 'accent') {
+        mode = 'accent';
+      }
+    }
 
     await startColorPicker(tab.id, mode);
   } catch (error) {

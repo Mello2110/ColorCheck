@@ -398,7 +398,12 @@
         }
 
         // Analyze region from screenshot
-        const colors = analyzeRegion(left, top, width, height);
+        let colors;
+        if (mode === 'accent') {
+            colors = analyzeAccentColors(left, top, width, height);
+        } else {
+            colors = analyzeRegion(left, top, width, height);
+        }
 
         // Send colors to background
         chrome.runtime.sendMessage({
@@ -588,7 +593,7 @@
                 overlay.style.cursor = 'none';
                 document.addEventListener('mousemove', handleMouseMove);
                 document.addEventListener('click', handleClick, true);
-            } else if (mode === 'palette') {
+            } else if (mode === 'palette' || mode === 'accent') {
                 overlay.style.cursor = 'crosshair';
                 document.addEventListener('mousedown', handlePaletteMouseDown);
                 document.addEventListener('mousemove', handlePaletteMouseMove);
@@ -613,5 +618,136 @@
         }
         return true;
     });
+
+    function analyzeAccentColors(left, top, width, height) {
+        const dpr = window.devicePixelRatio || 1;
+        const colorMap = new Map();
+        const step = Math.max(3, Math.floor(Math.min(width, height) / 30));
+
+        // 1. Sampling & Bucketing
+        for (let x = left; x < left + width; x += step) {
+            for (let y = top; y < top + height; y += step) {
+                const color = getPixelColor(x, y);
+
+                // Finer quantization for real colors (divide by 16)
+                const binR = Math.floor(color.r / 16) * 16;
+                const binG = Math.floor(color.g / 16) * 16;
+                const binB = Math.floor(color.b / 16) * 16;
+                const key = `${binR},${binG},${binB}`;
+
+                if (!colorMap.has(key)) {
+                    colorMap.set(key, { count: 0, r: 0, g: 0, b: 0, samples: 0 });
+                }
+                const entry = colorMap.get(key);
+                entry.count++;
+
+                // Accumulate actual values for centroid calculation
+                entry.r += color.r;
+                entry.g += color.g;
+                entry.b += color.b;
+                entry.samples++;
+            }
+        }
+
+        // 2. Convert buckets to centroids (clusters)
+        let clusters = [...colorMap.values()].map(c => ({
+            r: Math.round(c.r / c.samples),
+            g: Math.round(c.g / c.samples),
+            b: Math.round(c.b / c.samples),
+            count: c.count,
+            hsl: rgbToHsl(Math.round(c.r / c.samples), Math.round(c.g / c.samples), Math.round(c.b / c.samples))
+        }));
+
+        // Sort by frequency
+        clusters.sort((a, b) => b.count - a.count);
+
+        // 3. Select 3 distinct Accents
+        const accents = [];
+        const minDistance = 30; // Min distance in RGB space to be "distinct"
+
+        for (const cluster of clusters) {
+            if (accents.length >= 3) break;
+
+            // Check if distinct enough from already picked accents
+            let isDistinct = true;
+            for (const picked of accents) {
+                if (getColorDistance(cluster, picked) < minDistance) {
+                    isDistinct = false;
+                    break;
+                }
+            }
+
+            if (isDistinct) {
+                accents.push(cluster);
+            }
+        }
+
+        // Fill with default if not enough distinct colors found
+        while (accents.length < 3) {
+            // Find next most frequent even if similar, or duplicate
+            accents.push(accents[0] || { r: 0, g: 0, b: 0, hsl: { h: 0, s: 0, l: 0 } });
+        }
+
+        // 4. Select Base (Background)
+        let base = null;
+        let bestBaseScore = -1;
+
+        for (const cluster of clusters) {
+            let score = 0;
+            score += (cluster.count / clusters[0].count) * 2;
+            score += (100 - cluster.hsl.s) / 50;
+            const lDist = Math.abs(cluster.hsl.l - 50) / 50;
+            score += lDist * 2;
+
+            let conflicts = 0;
+            for (const acc of accents) {
+                if (getColorDistance(cluster, acc) < 20) conflicts++;
+            }
+            if (conflicts > 0) score -= 5;
+
+            if (score > bestBaseScore) {
+                bestBaseScore = score;
+                base = cluster;
+            }
+        }
+
+        if (!base) base = clusters[0];
+
+        // Ensure distinctness of Base from Accents if possible
+        if (getColorDistance(base, accents[0]) < 10 && clusters.length > 3) {
+            // Try to find another one
+            for (let i = 0; i < Math.min(10, clusters.length); i++) {
+                if (getColorDistance(clusters[i], accents[0]) > 30) {
+                    base = clusters[i];
+                    break;
+                }
+            }
+        }
+
+        return {
+            primary: formatColor(accents[0]), // UI Label: Accent 1
+            base: formatColor(base),         // UI Label: Base
+            accent: formatColor(accents[1]), // UI Label: Accent 2
+            accent2: formatColor(accents[2]) // UI Label: Accent 3
+        };
+    }
+
+    function getColorDistance(c1, c2) {
+        return Math.sqrt(
+            Math.pow(c1.r - c2.r, 2) +
+            Math.pow(c1.g - c2.g, 2) +
+            Math.pow(c1.b - c2.b, 2)
+        );
+    }
+
+    function formatColor(c) {
+        const hex = rgbToHex(c.r, c.g, c.b);
+        const hsl = rgbToHsl(c.r, c.g, c.b);
+        return {
+            hex: hex,
+            rgb: `rgb(${c.r}, ${c.g}, ${c.b})`,
+            hsl: `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`
+        };
+    }
 
 })();

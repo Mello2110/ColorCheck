@@ -23,16 +23,47 @@ document.addEventListener('DOMContentLoaded', () => {
   const startEyedropperBtn = document.getElementById('startEyedropper');
   const startPaletteBtn = document.getElementById('startPalette');
 
+  // DOM Elements - Mode Toggle
+  const modePaletteBtn = document.getElementById('modePalette');
+  const modeAccentBtn = document.getElementById('modeAccent');
+  let currentMode = 'palette';
+
   // Initialize
   init();
 
   async function init() {
     await loadTheme();
+    await loadMode();
     await loadFormat();
     await loadColors();
     await loadHistory();
     await loadFavorites();
     setupEventListeners();
+  }
+
+  async function loadMode() {
+    const result = await chrome.storage.local.get(['activeMode']);
+    currentMode = result.activeMode || 'palette';
+    updateModeUI();
+  }
+
+  function updateModeUI() {
+    if (currentMode === 'palette') {
+      modePaletteBtn.classList.add('active');
+      modeAccentBtn.classList.remove('active');
+      updateSwatchLabels(['Primary', 'Base', 'Accent 1', 'Accent 2']);
+    } else {
+      modeAccentBtn.classList.add('active');
+      modePaletteBtn.classList.remove('active');
+      updateSwatchLabels(['Accent 1', 'Base', 'Accent 2', 'Accent 3']);
+    }
+  }
+
+  function updateSwatchLabels(labels) {
+    if (primarySwatch) primarySwatch.querySelector('.swatch-label').textContent = labels[0];
+    if (baseSwatch) baseSwatch.querySelector('.swatch-label').textContent = labels[1];
+    if (accentSwatch) accentSwatch.querySelector('.swatch-label').textContent = labels[2];
+    if (accent2Swatch) accent2Swatch.querySelector('.swatch-label').textContent = labels[3];
   }
 
   async function loadShortcuts() {
@@ -92,9 +123,22 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Manual Triggers
+    // Manual Triggers - Button actions depend on active mode, but buttons themselves call triggerMode
     startEyedropperBtn.addEventListener('click', () => triggerMode('eyedropper'));
-    startPaletteBtn.addEventListener('click', () => triggerMode('palette'));
+    startPaletteBtn.addEventListener('click', () => triggerMode(currentMode)); // Uses currently selected mode
+
+    // Mode Toggle
+    modePaletteBtn.addEventListener('click', async () => {
+      currentMode = 'palette';
+      await chrome.storage.local.set({ activeMode: 'palette' });
+      updateModeUI();
+    });
+
+    modeAccentBtn.addEventListener('click', async () => {
+      currentMode = 'accent';
+      await chrome.storage.local.set({ activeMode: 'accent' });
+      updateModeUI();
+    });
 
     // Copy buttons
     document.querySelectorAll('.copy-btn').forEach(btn => {
