@@ -5,12 +5,8 @@
   "description": "Eyedropper and 4-color palette extractor for web designers",
   "permissions": [
     "activeTab",
-    "tabs",
     "scripting",
     "storage"
-  ],
-  "host_permissions": [
-    "<all_urls>"
   ],
   "options_page": "options.html",
   "action": {

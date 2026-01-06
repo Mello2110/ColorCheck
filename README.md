@@ -113,7 +113,7 @@ ColorCheck operates entirely offline. No data is collected, stored externally, o
 | Requirement | Details |
 |-------------|---------|
 | Manifest | V3 |
-| Permissions | `activeTab`, `tabs`, `scripting`, `storage` |
+| Permissions | `activeTab`, `scripting`, `storage` |
 | Compatibility | Chrome, Opera, Edge (Chromium-based browsers) |
 | Offline Support | Full functionality without internet |
 
