@@ -1,85 +1,87 @@
 /* ColorCheck Popup Styles */
-/* Minimalist dark theme with SF Pro typography */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  width: 280px;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  -webkit-font-feature-settings: "kern" 1;
-  font-feature-settings: "kern" 1;
-  letter-spacing: 0.3px;
-  background: #1a1a1a;
-  color: #ffffff;
-}
-
-.container {
+.popup-container {
+  width: 320px;
+  min-height: 400px;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* Header */
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #333;
+  justify-content: space-between;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
 }
 
 .header h1 {
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+  margin: 0;
 }
 
+.header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* Format Toggle */
 .format-toggle {
   display: flex;
-  gap: 2px;
-  background: #2a2a2a;
-  padding: 2px;
-  border-radius: 4px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  gap: 4px;
 }
 
 .format-btn {
-  background: transparent;
-  border: none;
-  color: #888;
-  font-size: 10px;
+  flex: 1;
+  padding: 8px 12px;
+  font-family: var(--font-family);
+  font-size: 0.7rem;
   font-weight: 500;
-  padding: 4px 8px;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  border-radius: 3px;
-  transition: all 0.15s ease;
-  font-family: inherit;
-  letter-spacing: 0.5px;
+  transition: all var(--transition-fast);
 }
 
 .format-btn:hover {
-  color: #ccc;
+  color: var(--text-primary);
 }
 
 .format-btn.active {
-  background: #444;
-  color: #fff;
+  background: var(--cc-gradient-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
 }
 
 /* Sections */
-section {
-  margin-bottom: 16px;
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-section h2 {
-  font-size: 11px;
-  font-weight: 500;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
+.section h2 {
+  font-size: 0.65rem;
 }
 
 /* Palette */
@@ -89,137 +91,153 @@ section h2 {
   gap: 8px;
 }
 
-.color-swatch {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #252525;
-  padding: 8px;
-  border-radius: 6px;
-}
-
-.swatch-color {
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  background: #333;
-  border: 1px solid rgba(255,255,255,0.1);
-  flex-shrink: 0;
-}
-
-.swatch-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.swatch-label {
-  display: block;
-  font-size: 10px;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 2px;
-}
-
-.swatch-value {
-  display: block;
-  font-size: 12px;
-  font-weight: 500;
-  color: #fff;
-  font-family: 'SF Mono', 'Consolas', monospace;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.copy-btn {
-  background: transparent;
-  border: none;
-  color: #555;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 4px;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.copy-btn:hover {
-  background: #333;
-  color: #fff;
-}
-
-.copy-btn.copied {
-  color: #4ade80;
-}
-
-/* History */
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* History Grid */
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
 }
 
 .history-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  background: #222;
-  border-radius: 4px;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-color);
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: all var(--transition-fast);
+  position: relative;
 }
 
 .history-item:hover {
-  background: #2a2a2a;
+  transform: scale(1.1);
+  border-color: var(--cc-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+  z-index: 1;
 }
 
-.history-color {
-  width: 20px;
-  height: 20px;
-  border-radius: 3px;
-  border: 1px solid rgba(255,255,255,0.1);
-  flex-shrink: 0;
+.history-item::after {
+  content: attr(data-hex);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-family: monospace;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  z-index: 10;
 }
 
-.history-value {
-  font-size: 11px;
-  font-family: 'SF Mono', 'Consolas', monospace;
-  color: #ccc;
+.history-item:hover::after {
+  opacity: 1;
 }
 
 .empty-state {
-  font-size: 12px;
-  color: #555;
+  grid-column: 1 / -1;
   text-align: center;
-  padding: 16px 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 16px;
 }
 
-/* Footer / Shortcuts */
+/* Shortcuts */
 .shortcuts {
   display: flex;
   justify-content: center;
   gap: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #333;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-color);
 }
 
 .shortcut {
-  font-size: 10px;
-  color: #555;
+  font-size: 0.65rem;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-kbd {
-  background: #2a2a2a;
-  border: 1px solid #444;
-  border-radius: 3px;
-  padding: 2px 5px;
-  font-size: 9px;
-  font-family: inherit;
-  color: #888;
+/* Footer */
+.footer {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.footer .btn {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 0.65rem;
+}
+
+/* Copied Animation */
+.copy-btn.copied svg,
+.swatch.copied .copy-btn svg {
+  stroke: #00D4FF;
+}
+
+.copy-btn.copied::after {
+  content: '✓';
+  position: absolute;
+  font-size: 10px;
+}
+
+/* Favorite Button States */
+.favorite-btn.active svg {
+  fill: var(--cc-orange);
+  stroke: var(--cc-orange);
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 1.7s forwards;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.toast-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
 }

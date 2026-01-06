@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorCheck Settings</title>
+    <link rel="stylesheet" href="design.css">
+    <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+    <div class="options-container" id="app">
+        <!-- Header -->
+        <header class="options-header">
+            <div class="header-brand">
+                <img src="icons/icon48.png" alt="ColorCheck" class="header-logo">
+                <div>
+                    <h1 class="gradient-text">ColorCheck</h1>
+                    <p class="header-subtitle">Settings</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="themeToggle" title="Toggle Dark Mode">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <path
+                            d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="options-main">
+            <!-- Keyboard Shortcuts -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Keyboard Shortcuts</h2>
+                    <p class="card-description">Customize your color picking hotkeys</p>
+                </div>
+                <div class="card-content">
+                    <div class="shortcut-row">
+                        <div class="shortcut-info">
+                            <span class="shortcut-name">Eyedropper Mode</span>
+                            <span class="shortcut-desc">Pick a single color from the page</span>
+                        </div>
+                        <div class="shortcut-keys">
+                            <kbd>Alt</kbd> + <kbd>C</kbd>
+                        </div>
+                    </div>
+                    <div class="shortcut-row">
+                        <div class="shortcut-info">
+                            <span class="shortcut-name">Palette Mode</span>
+                            <span class="shortcut-desc">Extract 3-color palette from selection</span>
+                        </div>
+                        <div class="shortcut-keys">
+                            <kbd>Alt</kbd> + <kbd>P</kbd>
+                        </div>
+                    </div>
+                    <p class="shortcut-note">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="8"></line>
+                        </svg>
+                        To change shortcuts, go to <a href="#" id="chromeShortcuts">chrome://extensions/shortcuts</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Favorites -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Favorites</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary" id="exportFavorites" title="Export all favorites">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+                            </svg>
+                            Export
+                        </button>
+                        <button class="btn btn-ghost" id="clearFavorites" title="Clear all favorites">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="favorites-grid" id="favoritesGrid">
+                        <p class="empty-state">No favorites saved yet</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Color History -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Recent Colors</h2>
+                    <button class="btn btn-ghost" id="clearHistory" title="Clear history">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div class="history-list" id="historyList">
+                        <p class="empty-state">No colors in history</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Format Preference -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Default Format</h2>
+                    <p class="card-description">Choose your preferred color format</p>
+                </div>
+                <div class="card-content">
+                    <div class="format-options">
+                        <label class="format-option">
+                            <input type="radio" name="format" value="hex" checked>
+                            <span class="format-label">
+                                <span class="format-name">HEX</span>
+                                <span class="format-example">#FF00AA</span>
+                            </span>
+                        </label>
+                        <label class="format-option">
+                            <input type="radio" name="format" value="rgb">
+                            <span class="format-label">
+                                <span class="format-name">RGB</span>
+                                <span class="format-example">rgb(255, 0, 170)</span>
+                            </span>
+                        </label>
+                        <label class="format-option">
+                            <input type="radio" name="format" value="hsl">
+                            <span class="format-label">
+                                <span class="format-name">HSL</span>
+                                <span class="format-example">hsl(320, 100%, 50%)</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>About</h2>
+                </div>
+                <div class="card-content about-content">
+                    <p>ColorCheck v1.0.0</p>
+                    <p class="about-desc">Eyedropper and palette extractor for web designers</p>
+                    <div class="about-links">
+                        <a href="#" class="btn btn-coffee" id="coffeeBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3">
+                                </path>
+                            </svg>
+                            Buy Me a Coffee
+                        </a>
+                        <a href="#" class="btn btn-secondary" id="landingBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path
+                                    d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z">
+                                </path>
+                            </svg>
+                            Website
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="options.js"></script>
+</body>
+
+</html>
