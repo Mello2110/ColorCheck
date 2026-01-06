@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const settingsBtn = document.getElementById('openSettings');
   const coffeeBtn = document.getElementById('coffeeBtn');
   const landingBtn = document.getElementById('landingBtn');
+  const startEyedropperBtn = document.getElementById('startEyedropper');
+  const startPaletteBtn = document.getElementById('startPalette');
 
   // Initialize
   init();
@@ -62,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       chrome.tabs.create({ url: LANDING_URL });
     });
+
+    // Manual Triggers
+    startEyedropperBtn.addEventListener('click', () => triggerMode('eyedropper'));
+    startPaletteBtn.addEventListener('click', () => triggerMode('palette'));
 
     // Copy buttons
     document.querySelectorAll('.copy-btn').forEach(btn => {
@@ -109,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateThemeIcon(isDark) {
-    themeToggle.innerHTML = isDark 
+    themeToggle.innerHTML = isDark
       ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
         </svg>`
@@ -207,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function toggleFavorite(colorData, btn) {
     const index = favorites.findIndex(f => f.hex === colorData.hex);
-    
+
     if (index > -1) {
       favorites.splice(index, 1);
       btn.classList.remove('active');
@@ -264,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toast = document.createElement('div');
     toast.className = 'toast';
-    
+
     if (color && color.startsWith('#')) {
       toast.innerHTML = `<div class="toast-swatch" style="background: ${color}"></div>${message}`;
     } else {
@@ -294,4 +300,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
+
+  // === MANUAL TRIGGER ===
+
+  async function triggerMode(mode) {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    if (!tab || !tab.id || tab.url.startsWith('chrome://') || tab.url.startsWith('edge://') || tab.url.startsWith('opera://') || tab.url.startsWith('about:')) {
+      showToast('Cannot identify colors on this page', '#ff0000');
+      return;
+    }
+
+    try {
+      // Inject content script if not present
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      }).catch(() => { }); // Ignore error if already injected
+
+      // Send command
+      await chrome.tabs.sendMessage(tab.id, { action: 'activate', mode });
+
+      // Close popup
+      window.close();
+    } catch (error) {
+      console.error('Trigger error:', error);
+      showToast('Failed to start. Refresh page?', '#ff0000');
+    }
+  }
 });

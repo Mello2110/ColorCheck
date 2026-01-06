@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const themeToggle = document.getElementById('themeToggle');
     const chromeShortcuts = document.getElementById('chromeShortcuts');
+    const operaShortcuts = document.getElementById('operaShortcuts');
     const favoritesGrid = document.getElementById('favoritesGrid');
     const historyList = document.getElementById('historyList');
     const exportBtn = document.getElementById('exportFavorites');
@@ -40,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             // Note: This won't work directly, user needs to manually navigate
             showToast('Open chrome://extensions/shortcuts in a new tab');
+        });
+
+        // Opera shortcuts link
+        operaShortcuts.addEventListener('click', (e) => {
+            e.preventDefault();
+            showToast('Open opera://extensions/shortcuts in a new tab');
         });
 
         // Export favorites

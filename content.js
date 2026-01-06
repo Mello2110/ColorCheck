@@ -3,8 +3,8 @@
 
 (function () {
     // Prevent multiple injections
-    if (window.__colorCheckActive) return;
-    window.__colorCheckActive = true;
+    if (window.__cc_installed) return;
+    window.__cc_installed = true;
 
     let mode = null;
     let overlay = null;

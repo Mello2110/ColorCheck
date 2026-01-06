@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ColorCheck",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Eyedropper and 3-color palette extractor for web designers",
   "permissions": [
     "activeTab",
@@ -30,13 +30,13 @@
   "commands": {
     "toggle-eyedropper": {
       "suggested_key": {
-        "default": "Alt+C"
+        "default": "Alt+Shift+C"
       },
       "description": "Activate eyedropper color picker"
     },
     "toggle-palette": {
       "suggested_key": {
-        "default": "Alt+P"
+        "default": "Alt+Shift+P"
       },
       "description": "Activate palette extraction mode"
     }
