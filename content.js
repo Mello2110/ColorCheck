@@ -160,7 +160,7 @@
       z-index: 2147483647;
       image-rendering: pixelated;
       display: none;
-    `;
+      `;
         magnifierCtx = magnifier.getContext('2d');
 
         // Color preview tooltip
@@ -666,14 +666,17 @@
                 entry.b += color.b;
                 entry.samples++;
 
-                // Check saturation for vivid representative
-                // Quick approx saturation using the current pixel color
+                // Check for "Best Pixel" (Most Prominent Real Pixel)
+                // Score ~ Saturation * 0.7 + |Lightness - 0.5| * 0.3
                 const max = Math.max(color.r, color.g, color.b);
                 const min = Math.min(color.r, color.g, color.b);
                 const sat = max === 0 ? 0 : (max - min) / max;
+                const light = (max + min) / 510; // 0..1
 
-                if (sat > entry.maxSat) {
-                    entry.maxSat = sat;
+                const pixelScore = (sat * 0.7) + (Math.abs(light - 0.5) * 0.3);
+
+                if (pixelScore > entry.maxSat) { // reusing maxSat field for score
+                    entry.maxSat = pixelScore;
                     entry.vividR = color.r;
                     entry.vividG = color.g;
                     entry.vividB = color.b;
@@ -723,21 +726,14 @@
         const globalAvgLightness = totalPixels > 0 ? weightedLight / totalPixels : 50;
 
         // Helper to check if two colors are perceptually similar (using HSL thresholds)
+        // Rule: |dH| < 20 AND |dS| < 25 AND |dL| < 20
         const areColorsSimilar = (c1, c2) => {
             const hDist = Math.abs(c1.hsl.h - c2.hsl.h);
             const rawH = Math.min(hDist, 360 - hDist);
             const dS = Math.abs(c1.hsl.s - c2.hsl.s);
             const dL = Math.abs(c1.hsl.l - c2.hsl.l);
 
-            // "Similar" if Hue is close AND Saturation/Lightness are reasonably close
-            // OR if all three are very close
-            // Rule: |dH| < 15 AND |dS| < 20 AND |dL| < 15 
-            if (rawH < 15 && dS < 20 && dL < 15) return true;
-
-            // Or extremely tight match including Lightness (for dark/white shades)
-            if (rawH < 10 && dS < 10 && dL < 10) return true;
-
-            return false;
+            return rawH < 20 && dS < 25 && dL < 20;
         };
 
         // 4. Calculate Saliency Score (Using VIVID color)
@@ -753,69 +749,39 @@
         // Sort candidates by Saliency (Descending)
         clusters.sort((a, b) => b.saliencyScore - a.saliencyScore);
 
-        // 4b. MERGE SIMILAR CLUSTERS
-        // We want to avoid having two "yellows" or two "reds" at the top.
-        // Iterate through sorted clusters and merge highly similar ones into the more salient one.
-        const distinctClusters = [];
-        for (const cluster of clusters) {
-            let merged = false;
-            for (const existing of distinctClusters) {
-                // Compare VIVID representatives for visual similarity
-                if (areColorsSimilar(cluster.vivid, existing.vivid)) {
-                    // Similar! Merge into the existing (which has higher score because we sorted).
-                    // We can add counts to make the existing one more "weighty" for Base selection later?
-                    // For Accents, we just want to suppress the duplicate.
-                    existing.count += cluster.count;
-
-                    // Optional: if the current one is actually MORE vivid (higher Saturation), maybe we should swap the vivid representative?
-                    // User requested: "Keep the cluster with higher saliencyScore OR higher saturation"
-                    // Since 'existing' has higher saliency (sorted order), we check if 'cluster' has significantly better saturation.
-                    if (cluster.vivid.hsl.s > existing.vivid.hsl.s + 10) {
-                        // Swap the vivid representative to the more saturated one
-                        existing.vivid = cluster.vivid;
-                        // But keep the SaliencyScore of the dominant one (or update it? Let's keep existing to maintain sort order roughly)
-                    }
-                    merged = true;
-                    break;
-                }
-            }
-            if (!merged) {
-                distinctClusters.push(cluster);
-            }
-        }
-
-        // Update clusters list to the merged distinct set
-        clusters = distinctClusters;
-
-        // 5. Select 3 distinct Accents (Diversity Filter)
+        // 5. Greedy Selection for 3 Accents
+        // No merging. Pick best, remove similar.
         const accents = [];
-        // We already merged similar ones, but we do a final check just in case
-        const minDistance = 35;
+        let candidates = [...clusters];
 
-        for (const cluster of clusters) {
-            if (accents.length >= 3) break;
+        while (accents.length < 3 && candidates.length > 0) {
+            // Pick top candidate
+            const best = candidates[0];
+            accents.push(best);
+            console.log(`ColorCheck: Selected Accent ${accents.length}:`, best.vivid);
 
-            let isDistinct = true;
-            for (const picked of accents) {
-                // Double check both RGB distance AND HSL similarity
-                if (getColorDistance(cluster.vivid, picked.vivid) < minDistance) {
-                    isDistinct = false;
-                    break;
-                }
-                if (areColorsSimilar(cluster.vivid, picked.vivid)) {
-                    isDistinct = false;
-                    break;
-                }
-            }
+            // Remove this and ALL similar clusters from candidates
+            candidates = candidates.filter(c => {
+                if (c === best) return false; // Remove self
 
-            if (isDistinct) {
-                accents.push(cluster);
-            }
+                // Remove if similar to the one we just picked
+                const isSimilar = areColorsSimilar(best.vivid, c.vivid);
+                return !isSimilar;
+            });
         }
 
-        // Fallback
+        // Fallback: Pick remaining clusters that aren't already selected
+        let fallbackIndex = 0;
         while (accents.length < 3) {
-            accents.push(clusters.shift() || { r: 128, g: 128, b: 128, hsl: { h: 0, s: 0, l: 50 }, vivid: { r: 128, g: 128, b: 128, hsl: { h: 0, s: 0, l: 50 } } });
+            if (fallbackIndex < clusters.length) {
+                const c = clusters[fallbackIndex++];
+                if (!accents.includes(c)) {
+                    accents.push(c);
+                }
+            } else {
+                // Completely out of clusters? Use gray.
+                accents.push({ r: 128, g: 128, b: 128, hsl: { h: 0, s: 0, l: 50 }, vivid: { r: 128, g: 128, b: 128, hsl: { h: 0, s: 0, l: 50 } } });
+            }
         }
 
         // 6. Select Base (Background) - Using AVERAGE color
