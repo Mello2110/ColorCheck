@@ -658,8 +658,36 @@
             hsl: rgbToHsl(Math.round(c.r / c.samples), Math.round(c.g / c.samples), Math.round(c.b / c.samples))
         }));
 
-        // Sort by frequency
-        clusters.sort((a, b) => b.count - a.count);
+        // Filter out tiny noise clusters (< 0.5% of max cluster)
+        const maxCount = Math.max(...clusters.map(c => c.count));
+        clusters = clusters.filter(c => c.count > maxCount * 0.005);
+
+        // 3. Compute Global Statistics (Weighted)
+        let totalPixels = 0;
+        let weightedSat = 0;
+        let weightedLight = 0;
+
+        for (const c of clusters) {
+            totalPixels += c.count;
+            weightedSat += c.hsl.s * c.count;
+            weightedLight += c.hsl.l * c.count;
+        }
+
+        const globalAvgSaturation = totalPixels > 0 ? weightedSat / totalPixels : 0;
+        const globalAvgLightness = totalPixels > 0 ? weightedLight / totalPixels : 50;
+
+        // 4. Calculate Saliency Score for Accents
+        for (const c of clusters) {
+            const saturationComponent = Math.max(0, c.hsl.s - globalAvgSaturation);
+            const lightnessContrast = Math.abs(c.hsl.l - globalAvgLightness);
+            const frequencyComponent = Math.log(1 + c.count);
+
+            // Weighted Saliency Score
+            c.saliencyScore = (saturationComponent * 2.5) + (lightnessContrast * 1.0) + (frequencyComponent * 2.0);
+        }
+
+        // Sort candidates by Saliency (Descending)
+        clusters.sort((a, b) => b.saliencyScore - a.saliencyScore);
 
         // 3. Select 3 distinct Accents
         const accents = [];
@@ -688,41 +716,32 @@
             accents.push(accents[0] || { r: 0, g: 0, b: 0, hsl: { h: 0, s: 0, l: 0 } });
         }
 
-        // 4. Select Base (Background)
+        // 6. Select Base (Background)
         let base = null;
-        let bestBaseScore = -1;
+        let bestBaseScore = -Infinity;
 
-        for (const cluster of clusters) {
-            let score = 0;
-            score += (cluster.count / clusters[0].count) * 2;
-            score += (100 - cluster.hsl.s) / 50;
-            const lDist = Math.abs(cluster.hsl.l - 50) / 50;
-            score += lDist * 2;
-
-            let conflicts = 0;
+        // Re-iterate (we need to find best background, which might have low saliency)
+        for (const c of clusters) {
+            // Don't pick a color that is already an accent
+            let isUsed = false;
             for (const acc of accents) {
-                if (getColorDistance(cluster, acc) < 20) conflicts++;
+                if (getColorDistance(c, acc) < 20) isUsed = true;
             }
-            if (conflicts > 0) score -= 5;
+            if (isUsed) continue;
+
+            const countFactor = Math.log(1 + c.count);
+            const lowSatFactor = (100 - c.hsl.s);
+
+            // Base Score: Frequency is very important for background
+            const score = (countFactor * 3.0) + (lowSatFactor * 1.5);
 
             if (score > bestBaseScore) {
                 bestBaseScore = score;
-                base = cluster;
+                base = c;
             }
         }
 
-        if (!base) base = clusters[0];
-
-        // Ensure distinctness of Base from Accents if possible
-        if (getColorDistance(base, accents[0]) < 10 && clusters.length > 3) {
-            // Try to find another one
-            for (let i = 0; i < Math.min(10, clusters.length); i++) {
-                if (getColorDistance(clusters[i], accents[0]) > 30) {
-                    base = clusters[i];
-                    break;
-                }
-            }
-        }
+        if (!base) base = accents[0];
 
         return {
             primary: formatColor(accents[0]), // UI Label: Accent 1
