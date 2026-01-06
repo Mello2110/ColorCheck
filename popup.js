@@ -2,13 +2,14 @@
 // Enhanced with favorites, dark mode, and 10-color history
 
 document.addEventListener('DOMContentLoaded', () => {
-  // External Links - REPLACE WITH YOUR URLS
-  const COFFEE_URL = 'https://buymeacoffee.com/YOUR_USERNAME';
-  const LANDING_URL = 'https://your-landing-page.com';
+  // External Links
+  const COFFEE_URL = 'https://buymeacoffee.com/mellowsolutions';
+  const LANDING_URL = 'https://mello2110.github.io/LandingpageMellowSolutions/';
 
   let currentFormat = 'hex';
   let currentColors = null;
   let favorites = [];
+  const MAX_FAVORITES = 50;
 
   // DOM Elements
   const formatBtns = document.querySelectorAll('.format-btn');
@@ -191,15 +192,25 @@ document.addEventListener('DOMContentLoaded', () => {
            data-hex="${color.hex}"
            data-rgb="${color.rgb}"
            data-hsl="${color.hsl}"
-           title="Click to copy">
+           title="Click: copy | Right-click: add to favorites">
       </div>
     `).join('');
 
-    // Click to copy
+    // Click to copy, right-click to add to favorites
     historyList.querySelectorAll('.history-item').forEach(item => {
       item.addEventListener('click', () => {
         const value = item.dataset[currentFormat];
         copyToClipboard(value, item);
+      });
+
+      item.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const colorData = {
+          hex: item.dataset.hex,
+          rgb: item.dataset.rgb,
+          hsl: item.dataset.hsl
+        };
+        addToFavorites(colorData);
       });
     });
   }
@@ -211,6 +222,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === FAVORITES ===
 
+  function addToFavorites(colorData) {
+    // Check if already in favorites
+    if (favorites.some(f => f.hex === colorData.hex)) {
+      showToast('Already in favorites', colorData.hex);
+      return;
+    }
+
+    // Check limit
+    if (favorites.length >= MAX_FAVORITES) {
+      showToast(`Max ${MAX_FAVORITES} favorites! Delete one first.`, '#ff4444');
+      return;
+    }
+
+    favorites.push({
+      hex: colorData.hex,
+      rgb: colorData.rgb,
+      hsl: colorData.hsl,
+      timestamp: Date.now()
+    });
+
+    chrome.storage.local.set({ favorites });
+    showToast('Added to favorites (' + favorites.length + '/' + MAX_FAVORITES + ')', colorData.hex);
+    updateFavoriteButtons();
+  }
+
   function toggleFavorite(colorData, btn) {
     const index = favorites.findIndex(f => f.hex === colorData.hex);
 
@@ -219,6 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.remove('active');
       showToast('Removed from favorites', colorData.hex);
     } else {
+      // Check limit
+      if (favorites.length >= MAX_FAVORITES) {
+        showToast(`Max ${MAX_FAVORITES} favorites! Delete one first.`, '#ff4444');
+        return;
+      }
+
       favorites.push({
         hex: colorData.hex,
         rgb: colorData.rgb,
@@ -226,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timestamp: Date.now()
       });
       btn.classList.add('active');
-      showToast('Added to favorites', colorData.hex);
+      showToast('Added to favorites (' + favorites.length + '/' + MAX_FAVORITES + ')', colorData.hex);
     }
 
     chrome.storage.local.set({ favorites });

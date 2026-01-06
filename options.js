@@ -2,9 +2,10 @@
 // Manages settings, favorites gallery, and history
 
 document.addEventListener('DOMContentLoaded', () => {
-    // External Links - REPLACE WITH YOUR URLS
-    const COFFEE_URL = 'https://buymeacoffee.com/YOUR_USERNAME';
-    const LANDING_URL = 'https://your-landing-page.com';
+    // External Links
+    const COFFEE_URL = 'https://buymeacoffee.com/mellowsolutions';
+    const LANDING_URL = 'https://mello2110.github.io/LandingpageMellowSolutions/';
+    const MAX_FAVORITES = 50;
 
     // DOM Elements
     const themeToggle = document.getElementById('themeToggle');
@@ -252,11 +253,37 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `).join('');
 
-        // Click to copy
+        // Click to copy, right-click to add to favorites
         historyList.querySelectorAll('.history-row').forEach(row => {
             row.addEventListener('click', () => {
                 const value = row.dataset[currentFormat];
                 copyToClipboard(value, row.dataset.hex);
+            });
+
+            row.addEventListener('contextmenu', async (e) => {
+                e.preventDefault();
+                const result = await chrome.storage.local.get(['favorites']);
+                let favorites = result.favorites || [];
+
+                const colorData = {
+                    hex: row.dataset.hex,
+                    rgb: row.dataset.rgb,
+                    hsl: row.dataset.hsl
+                };
+
+                if (favorites.some(f => f.hex === colorData.hex)) {
+                    showToast('Already in favorites');
+                    return;
+                }
+
+                if (favorites.length >= MAX_FAVORITES) {
+                    showToast(`Max ${MAX_FAVORITES} favorites! Delete one first.`);
+                    return;
+                }
+
+                favorites.push({ ...colorData, timestamp: Date.now() });
+                await chrome.storage.local.set({ favorites });
+                showToast('Added to favorites (' + favorites.length + '/' + MAX_FAVORITES + ')', colorData.hex);
             });
         });
     }
