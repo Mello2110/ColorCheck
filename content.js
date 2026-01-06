@@ -722,6 +722,24 @@
         const globalAvgSaturation = totalPixels > 0 ? weightedSat / totalPixels : 0;
         const globalAvgLightness = totalPixels > 0 ? weightedLight / totalPixels : 50;
 
+        // Helper to check if two colors are perceptually similar (using HSL thresholds)
+        const areColorsSimilar = (c1, c2) => {
+            const hDist = Math.abs(c1.hsl.h - c2.hsl.h);
+            const rawH = Math.min(hDist, 360 - hDist);
+            const dS = Math.abs(c1.hsl.s - c2.hsl.s);
+            const dL = Math.abs(c1.hsl.l - c2.hsl.l);
+
+            // "Similar" if Hue is close AND Saturation/Lightness are reasonably close
+            // OR if all three are very close
+            // Rule: |dH| < 15 AND |dS| < 20 AND |dL| < 15 
+            if (rawH < 15 && dS < 20 && dL < 15) return true;
+
+            // Or extremely tight match including Lightness (for dark/white shades)
+            if (rawH < 10 && dS < 10 && dL < 10) return true;
+
+            return false;
+        };
+
         // 4. Calculate Saliency Score (Using VIVID color)
         for (const c of clusters) {
             const saturationComponent = Math.max(0, c.vivid.hsl.s - globalAvgSaturation);
@@ -735,8 +753,43 @@
         // Sort candidates by Saliency (Descending)
         clusters.sort((a, b) => b.saliencyScore - a.saliencyScore);
 
-        // 5. Select 3 distinct Accents
+        // 4b. MERGE SIMILAR CLUSTERS
+        // We want to avoid having two "yellows" or two "reds" at the top.
+        // Iterate through sorted clusters and merge highly similar ones into the more salient one.
+        const distinctClusters = [];
+        for (const cluster of clusters) {
+            let merged = false;
+            for (const existing of distinctClusters) {
+                // Compare VIVID representatives for visual similarity
+                if (areColorsSimilar(cluster.vivid, existing.vivid)) {
+                    // Similar! Merge into the existing (which has higher score because we sorted).
+                    // We can add counts to make the existing one more "weighty" for Base selection later?
+                    // For Accents, we just want to suppress the duplicate.
+                    existing.count += cluster.count;
+
+                    // Optional: if the current one is actually MORE vivid (higher Saturation), maybe we should swap the vivid representative?
+                    // User requested: "Keep the cluster with higher saliencyScore OR higher saturation"
+                    // Since 'existing' has higher saliency (sorted order), we check if 'cluster' has significantly better saturation.
+                    if (cluster.vivid.hsl.s > existing.vivid.hsl.s + 10) {
+                        // Swap the vivid representative to the more saturated one
+                        existing.vivid = cluster.vivid;
+                        // But keep the SaliencyScore of the dominant one (or update it? Let's keep existing to maintain sort order roughly)
+                    }
+                    merged = true;
+                    break;
+                }
+            }
+            if (!merged) {
+                distinctClusters.push(cluster);
+            }
+        }
+
+        // Update clusters list to the merged distinct set
+        clusters = distinctClusters;
+
+        // 5. Select 3 distinct Accents (Diversity Filter)
         const accents = [];
+        // We already merged similar ones, but we do a final check just in case
         const minDistance = 35;
 
         for (const cluster of clusters) {
@@ -744,8 +797,12 @@
 
             let isDistinct = true;
             for (const picked of accents) {
-                // Compare Vivid colors for distinctness
+                // Double check both RGB distance AND HSL similarity
                 if (getColorDistance(cluster.vivid, picked.vivid) < minDistance) {
+                    isDistinct = false;
+                    break;
+                }
+                if (areColorsSimilar(cluster.vivid, picked.vivid)) {
                     isDistinct = false;
                     break;
                 }
