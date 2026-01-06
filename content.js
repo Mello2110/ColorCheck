@@ -347,7 +347,7 @@
     // === PALETTE MODE HANDLERS ===
 
     function handlePaletteMouseDown(e) {
-        if (!isActive || mode !== 'palette') return;
+        if (!isActive || (mode !== 'palette' && mode !== 'accent')) return;
 
         isDrawing = true;
         startX = e.clientX;
