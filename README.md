@@ -5,13 +5,13 @@
 <h1 align="center">ColorCheck</h1>
 
 <p align="center">
-  <strong>Eyedropper & Palette Extractor for Web Designers</strong>
+  <strong>Eyedropper, Palette Extractor & Complementary Color Generator for Web Designers</strong>
 </p>
 
 <p align="center">
   <a href="https://chrome.google.com/webstore"><img src="https://img.shields.io/badge/Chrome-Extension-00D4FF?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Extension"></a>
   <a href="https://addons.opera.com"><img src="https://img.shields.io/badge/Opera-Add--on-FF1B2D?style=flat-square&logo=opera&logoColor=white" alt="Opera Add-on"></a>
-  <img src="https://img.shields.io/badge/Version-2.1.0-FF00AA?style=flat-square" alt="Version 2.1.0">
+  <img src="https://img.shields.io/badge/Version-2.2.0-FF00AA?style=flat-square" alt="Version 2.2.0">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-0066FF?style=flat-square" alt="License"></a>
 </p>
 
@@ -19,7 +19,7 @@
 
 ## Overview
 
-ColorCheck is a browser extension designed for web designers and developers. Pick colors from any webpage with a single click, or extract complete color palettes from image regions. Works entirely offline with no data collection.
+ColorCheck is a browser extension designed for web designers and developers. Pick colors from any webpage with a single click, extract complete color palettes from image regions, or generate complementary color schemes from any color code. Works entirely offline with no data collection.
 
 ---
 
@@ -38,6 +38,21 @@ Drag to select any region and automatically extract a harmonious 4-color palette
 |------|-------------|
 | **Palette** | Extracts Primary, Base, Accent 1, Accent 2 – optimized for web design |
 | **Accent** | Focuses on vibrant, visually distinct accent colors from the selection |
+
+### 🌈 Complementary Generator
+Enter any color (HEX, RGB, or HSL) and instantly generate a harmonious split-complementary trio.
+
+| Swatch | Hue Shift | Description |
+|--------|-----------|-------------|
+| **Base** | — | Your input color as visual reference |
+| **Complement** | 180° | True opposite on the color wheel |
+| **Split 1** | 150° | Left split-complement |
+| **Split 2** | 210° | Right split-complement |
+
+- Output follows your preferred format (HEX / RGB / HSL)
+- Click any swatch to copy its value
+- ★ Save generated colors directly to favorites
+- Click palette or history colors to auto-fill the generator
 
 ### ⚙️ Customization
 - **Color Formats** — HEX, RGB, or HSL output

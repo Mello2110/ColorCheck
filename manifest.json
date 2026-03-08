@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "ColorCheck",
-  "version": "2.1.0",
-  "description": "Eyedropper and 4-color palette extractor for web designers",
+  "version": "2.2.0",
+  "description": "Eyedropper, palette extractor & complementary color generator for web designers",
   "permissions": [
     "activeTab",
     "scripting",

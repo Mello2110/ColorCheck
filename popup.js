@@ -44,6 +44,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const modeAccentBtn = document.getElementById('modeAccent');
   let currentMode = 'palette';
 
+  // Complementary Elements
+  const compInput = document.getElementById('compInput');
+  const generateCompBtn = document.getElementById('generateComp');
+  const compBaseSwatch = document.getElementById('compBase');
+  const compResults = [
+    { el: document.getElementById('compTrue'), shift: 180 },
+    { el: document.getElementById('compSplit1'), shift: 150 },
+    { el: document.getElementById('compSplit2'), shift: 210 }
+  ];
+
   // Initialize
   init();
 
@@ -210,6 +220,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
+
+    // Complementary Generator
+    generateCompBtn.addEventListener('click', generateComplementary);
+    compInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') generateComplementary();
+    });
+
+    // Copy for Complementary swatches (click swatch-color to copy)
+    [compBaseSwatch, ...compResults.map(r => r.el)].forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.comp-fav-btn')) return;
+        const value = el.querySelector('.swatch-value').textContent;
+        if (value && value !== '--') {
+          copyToClipboard(value, el);
+        }
+      });
+    });
+
+    // Favorites for Complementary swatches
+    document.querySelectorAll('.comp-fav-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const swatch = btn.closest('.comp-swatch');
+        const hex = swatch.querySelector('.swatch-value').textContent;
+        if (hex && hex !== '--') {
+          const rgb = parseToRgb(hex);
+          if (rgb) {
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            addToFavorites({
+              hex: hex,
+              rgb: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
+              hsl: `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
+            });
+          }
+        }
+      });
+    });
+
+    // Auto-fill Complementary input from Palette swatches
+    [primarySwatch, baseSwatch, accentSwatch, accent2Swatch].forEach(swatch => {
+      if (swatch) {
+        swatch.querySelector('.swatch-color').addEventListener('click', () => {
+          const value = swatch.querySelector('.swatch-value').textContent;
+          if (value && value !== '--') {
+            compInput.value = value;
+            generateComplementary();
+          }
+        });
+      }
+    });
   }
 
   // === THEME ===
@@ -367,10 +427,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Removed from history');
       });
 
-      // Click on swatch color to copy
+      // Click on swatch color to auto-fill Complementary generator
       swatch.querySelector('.swatch-color').addEventListener('click', () => {
-        const value = getFormattedHistoryValue(colorData);
-        copyToClipboard(value, swatch);
+        compInput.value = colorData.hex;
+        generateComplementary();
       });
     });
 
@@ -453,6 +513,139 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     chrome.storage.local.set({ favorites });
+  }
+
+  // === COMPLEMENTARY GENERATOR ===
+
+  function generateComplementary() {
+    const input = compInput.value.trim();
+    if (!input) return;
+
+    const rgb = parseToRgb(input);
+    if (!rgb) {
+      showToast('Invalid color format', '#ff0000');
+      return;
+    }
+
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const baseHex = hslToHex(hsl.h, hsl.s, hsl.l);
+
+    // Update base color preview
+    const baseColorDiv = compBaseSwatch.querySelector('.swatch-color');
+    const baseValueSpan = compBaseSwatch.querySelector('.swatch-value');
+    baseColorDiv.style.background = baseHex;
+    baseValueSpan.textContent = formatCompColor(rgb, hsl);
+
+    // Update trio swatches
+    compResults.forEach(res => {
+      const newHue = (hsl.h + res.shift) % 360;
+      const newHex = hslToHex(newHue, hsl.s, hsl.l);
+      const newRgb = parseToRgb(newHex);
+      const newHsl = { h: newHue, s: hsl.s, l: hsl.l };
+      
+      const colorDiv = res.el.querySelector('.swatch-color');
+      const valueSpan = res.el.querySelector('.swatch-value');
+      
+      colorDiv.style.background = newHex;
+      valueSpan.textContent = formatCompColor(newRgb, newHsl);
+    });
+
+    showToast('Trio generated');
+  }
+
+  function formatCompColor(rgb, hsl) {
+    switch (currentFormat) {
+      case 'rgb':
+        return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+      case 'hsl':
+        return `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`;
+      default:
+        return hslToHex(hsl.h, hsl.s, hsl.l);
+    }
+  }
+
+  function fillCompInput(hexValue) {
+    if (hexValue && hexValue !== '--') {
+      compInput.value = hexValue;
+      generateComplementary();
+    }
+  }
+
+  // === COLOR UTILITIES ===
+
+  function parseToRgb(str) {
+    // Hex
+    if (str.startsWith('#')) {
+      const hex = str.length === 4 
+        ? '#' + str[1] + str[1] + str[2] + str[2] + str[3] + str[3]
+        : str;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return isNaN(r) || isNaN(g) || isNaN(b) ? null : { r, g, b };
+    }
+    // RGB
+    const rgbMatch = str.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+    if (rgbMatch) {
+      return { r: parseInt(rgbMatch[1]), g: parseInt(rgbMatch[2]), b: parseInt(rgbMatch[3]) };
+    }
+    // HSL
+    const hslMatch = str.match(/hsl\s*\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/i);
+    if (hslMatch) {
+      const h = parseInt(hslMatch[1]);
+      const s = parseInt(hslMatch[2]);
+      const l = parseInt(hslMatch[3]);
+      const hex = hslToHex(h, s, l);
+      return parseToRgb(hex);
+    }
+    return null;
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 360, s: s * 100, l: l * 100 };
+  }
+
+  function hslToHex(h, s, l) {
+    h /= 360; s /= 100; l /= 100;
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    const toHex = x => {
+      const hex = Math.round(x * 255).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
   }
 
   function updateFavoriteButtons() {
