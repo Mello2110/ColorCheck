@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "ColorCheck",
-  "version": "2.2.0",
-  "description": "Eyedropper, palette extractor & complementary color generator for web designers",
+  "version": "2.3.0",
+  "description": "Perceptual OKLCH Eyedropper, 60-30-10 Palette Extractor, WCAG Contrast & Harmony Studio for Web Designers",
   "permissions": [
     "activeTab",
     "scripting",

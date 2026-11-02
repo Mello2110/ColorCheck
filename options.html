@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ColorCheck Settings</title>
+    <title>ColorCheck Studio Settings</title>
     <link rel="stylesheet" href="design.css">
     <link rel="stylesheet" href="options.css">
 </head>
@@ -16,8 +16,11 @@
             <div class="header-brand">
                 <img src="icons/icon48.png" alt="ColorCheck" class="header-logo">
                 <div>
-                    <h1 class="gradient-text">ColorCheck</h1>
-                    <p class="header-subtitle">Settings</p>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <h1 class="gradient-text">ColorCheck</h1>
+                        <span class="studio-badge">v2.3.0 OKLCH</span>
+                    </div>
+                    <p class="header-subtitle">Perceptual Color Studio & Settings</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -33,6 +36,106 @@
         </header>
 
         <main class="options-main">
+            <!-- Favorites -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Saved Favorites</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary" id="exportCssBtn" title="Export favorites as CSS variables">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"></polyline>
+                                <polyline points="8 6 2 12 8 18"></polyline>
+                            </svg>
+                            Export CSS
+                        </button>
+                        <button class="btn btn-secondary" id="exportFavorites" title="Export all favorites as JSON">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+                            </svg>
+                            Export JSON
+                        </button>
+                        <button class="btn btn-ghost" id="clearFavorites" title="Clear all favorites">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="favorites-grid" id="favoritesGrid">
+                        <p class="empty-state">No favorites saved yet</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Color History -->
+            <section class="card">
+                <div class="card-header">
+                    <h2>Recent Session Colors</h2>
+                    <button class="btn btn-ghost" id="clearHistory" title="Clear history">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div class="favorites-grid" id="historyList">
+                        <p class="empty-state">No colors in history</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Format Preference -->
+            <section class="card">
+                <details open>
+                    <summary class="card-header summary-header">
+                        <h2>Default Color Space & Format</h2>
+                        <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </summary>
+                    <div class="card-content">
+                        <div class="format-options">
+                            <label class="format-option">
+                                <input type="radio" name="format" value="hex" checked>
+                                <span class="format-label">
+                                    <span class="format-name">HEX (sRGB Hexadecimal)</span>
+                                    <span class="format-example">#00D4FF</span>
+                                </span>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="format" value="oklch">
+                                <span class="format-label">
+                                    <span class="format-name">OKLCH (Perceptual CSS Color 4)</span>
+                                    <span class="format-example">oklch(81% 0.155 212)</span>
+                                </span>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="format" value="rgb">
+                                <span class="format-label">
+                                    <span class="format-name">RGB (sRGB Functional)</span>
+                                    <span class="format-example">rgb(0, 212, 255)</span>
+                                </span>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="format" value="hsl">
+                                <span class="format-label">
+                                    <span class="format-name">HSL (Cylindrical sRGB)</span>
+                                    <span class="format-example">hsl(190, 100%, 50%)</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
             <!-- Keyboard Shortcuts -->
             <section class="card">
                 <details>
@@ -47,7 +150,7 @@
                         <div class="shortcut-row">
                             <div class="shortcut-info">
                                 <span class="shortcut-name">Eyedropper Mode</span>
-                                <span class="shortcut-desc">Pick a single color from the page</span>
+                                <span class="shortcut-desc">Pick a single pixel with live OKLCH & WCAG HUD</span>
                             </div>
                             <div class="shortcut-keys" id="eyedropperShortcut">
                                 <span class="shortcut-loading">Loading...</span>
@@ -55,8 +158,8 @@
                         </div>
                         <div class="shortcut-row">
                             <div class="shortcut-info">
-                                <span class="shortcut-name">Palette Mode</span>
-                                <span class="shortcut-desc">Extract 3-color palette from selection</span>
+                                <span class="shortcut-name">Region Extraction Mode</span>
+                                <span class="shortcut-desc">Extract 4-color UI Palette (60-30-10) or Vivid Accents</span>
                             </div>
                             <div class="shortcut-keys" id="paletteShortcut">
                                 <span class="shortcut-loading">Loading...</span>
@@ -79,100 +182,14 @@
                 </details>
             </section>
 
-            <!-- Favorites -->
-            <section class="card">
-                <div class="card-header">
-                    <h2>Favorites</h2>
-                    <div class="card-actions">
-                        <button class="btn btn-secondary" id="exportFavorites" title="Export all favorites">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
-                            </svg>
-                            Export
-                        </button>
-                        <button class="btn btn-ghost" id="clearFavorites" title="Clear all favorites">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="favorites-grid" id="favoritesGrid">
-                        <p class="empty-state">No favorites saved yet</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Color History -->
-            <section class="card">
-                <div class="card-header">
-                    <h2>Recent Colors</h2>
-                    <button class="btn btn-ghost" id="clearHistory" title="Clear history">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="card-content">
-                    <div class="favorites-grid" id="historyList">
-                        <p class="empty-state">No colors in history</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Format Preference -->
-            <section class="card">
-                <details>
-                    <summary class="card-header summary-header">
-                        <h2>Default Format</h2>
-                        <svg class="dropdown-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </summary>
-                    <div class="card-content">
-                        <div class="format-options">
-                            <label class="format-option">
-                                <input type="radio" name="format" value="hex" checked>
-                                <span class="format-label">
-                                    <span class="format-name">HEX</span>
-                                    <span class="format-example">#FF00AA</span>
-                                </span>
-                            </label>
-                            <label class="format-option">
-                                <input type="radio" name="format" value="rgb">
-                                <span class="format-label">
-                                    <span class="format-name">RGB</span>
-                                    <span class="format-example">rgb(255, 0, 170)</span>
-                                </span>
-                            </label>
-                            <label class="format-option">
-                                <input type="radio" name="format" value="hsl">
-                                <span class="format-label">
-                                    <span class="format-name">HSL</span>
-                                    <span class="format-example">hsl(320, 100%, 50%)</span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                </details>
-            </section>
-
             <!-- About -->
             <section class="card">
                 <div class="card-header">
                     <h2>About</h2>
                 </div>
                 <div class="card-content about-content">
-                    <p>ColorCheck v2.1.0</p>
-                    <p class="about-desc">Eyedropper and palette extractor for web designers</p>
+                    <p>ColorCheck v2.3.0 — Perceptual Color Studio</p>
+                    <p class="about-desc">Powered by OKLab/OKLCH perceptual clustering, WCAG 2.1 auto-fixer, CVD simulation & gamut-mapped harmonies</p>
                     <div class="brand-section">
                         <a href="#" id="brandLogoLink" class="brand-logo-link" title="Visit Mellow Solutions">
                             <img src="icons/mellow-logo.png" alt="Mellow Solutions" class="brand-logo-large">

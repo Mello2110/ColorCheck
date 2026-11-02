@@ -1,17 +1,6 @@
 <!--
   Copyright 2026 Mellow Solutions
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+  Licensed under the Apache License, Version 2.0
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -30,11 +19,16 @@
     <header class="header">
       <div class="header-brand">
         <img src="icons/icon32.png" alt="ColorCheck" class="header-logo">
-        <h1 class="gradient-text">ColorCheck</h1>
+        <div class="brand-title-wrap">
+          <h1 class="gradient-text">ColorCheck</h1>
+          <span class="studio-badge">v2.3 OKLCH</span>
+        </div>
       </div>
       <div class="header-actions">
+        <!-- Quick Format Cycle Pill -->
+        <button class="format-pill" id="formatCycleBtn" title="Switch color format (HEX / RGB / HSL / OKLCH)">HEX</button>
         <a href="#" class="icon-btn coffee-btn" id="coffeeBtn" title="Support: Buy Me a Coffee">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8h1a4 4 0 010 8h-1"></path>
             <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"></path>
             <line x1="6" y1="1" x2="6" y2="4"></line>
@@ -42,137 +36,180 @@
             <line x1="14" y1="1" x2="14" y2="4"></line>
           </svg>
         </a>
-        <button class="icon-btn" id="themeToggle" title="Toggle Dark Mode">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="icon-btn" id="themeToggle" title="Toggle Dark/Light Theme">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"></circle>
-            <path
-              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42">
-            </path>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
           </svg>
         </button>
-        <button class="icon-btn" id="openSettings" title="Settings">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="icon-btn" id="openSettings" title="Settings & Favorites">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
-            <path
-              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z">
-            </path>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path>
           </svg>
         </button>
       </div>
     </header>
 
-    <!-- Manual Triggers -->
-    <div class="manual-triggers">
-      <button class="btn btn-primary trigger-btn" id="startEyedropper">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z" />
-        </svg>
-        Pick Color
-      </button>
-      <button class="btn btn-secondary trigger-btn" id="startPalette">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-          <path d="M3 9h18M9 21V9" />
-        </svg>
-        Extract Palette
-      </button>
-    </div>
-
-    <!-- Mode Toggle -->
-    <div class="mode-toggle-container">
-      <div class="mode-toggle">
-        <button class="mode-btn active" id="modePalette" data-mode="palette">Palette</button>
-        <button class="mode-btn" id="modeAccent" data-mode="accent">Accent</button>
-      </div>
-    </div>
-
-    <!-- Current Palette -->
-    <section class="section">
-      <div class="section-header">
-        <h2>Palette</h2>
-        <button class="icon-btn" id="clearPalette" title="Clear Palette">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+    <!-- Primary Capture Controls -->
+    <div class="capture-controls">
+      <div class="manual-triggers">
+        <button class="btn btn-primary trigger-btn" id="startEyedropper" title="Pick single pixel color (Ctrl+Shift+E)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="m2 22 1-1h3l9-9"></path>
+            <path d="M3 21v-3l9-9"></path>
+            <path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"></path>
           </svg>
+          Pick Color
+        </button>
+        <button class="btn btn-secondary trigger-btn" id="startPalette" title="Drag region to extract palette (Ctrl+Shift+P)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="3" ry="3" />
+            <path d="M3 9h18M9 21V9" />
+          </svg>
+          Extract Region
         </button>
       </div>
+
+      <!-- Extraction Algorithm Mode Switch -->
+      <div class="mode-toggle" role="tablist" aria-label="Extraction Mode">
+        <button class="mode-btn active" id="modePalette" data-mode="palette" title="60-30-10 UI System: Base, Primary, Accent 1 & 2">
+          <span>UI Palette</span>
+          <small>60·30·10</small>
+        </button>
+        <button class="mode-btn" id="modeAccent" data-mode="accent" title="Perceptual Saliency: Extracts the 3 most vivid accents + Base">
+          <span>Vivid Accents</span>
+          <small>Saliency</small>
+        </button>
+      </div>
+    </div>
+
+    <!-- Extracted Palette Section -->
+    <section class="section card-section">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h2>Extracted Palette</h2>
+          <span class="cvd-status-badge" id="cvdStatusBadge" title="Color Vision Deficiency (CVD) distinguishability check"></span>
+        </div>
+        <div class="section-actions">
+          <button class="action-pill-btn" id="copyPaletteCss" title="Copy palette as CSS Custom Properties (:root)">
+            CSS
+          </button>
+          <button class="action-pill-btn" id="copyPaletteTw" title="Copy palette & OKLCH tonal scale as Tailwind config">
+            TW
+          </button>
+          <button class="icon-btn danger-hover" id="clearPalette" title="Clear Palette">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 60-30-10 Live Proportional Preview Bar -->
+      <div class="palette-preview-bar" id="palettePreviewBar" title="Proportional 60-30-10 UI Balance">
+        <div class="preview-seg seg-base" id="barBase"></div>
+        <div class="preview-seg seg-primary" id="barPrimary"></div>
+        <div class="preview-seg seg-accent1" id="barAccent1"></div>
+        <div class="preview-seg seg-accent2" id="barAccent2"></div>
+      </div>
+
+      <!-- Color Vision Deficiency (CVD) Simulator Bar -->
+      <div class="cvd-bar" id="cvdBar" title="Simulate Color Blindness (Daltonization Preview)">
+        <span class="cvd-bar-label">Vision:</span>
+        <div class="cvd-pills">
+          <button class="cvd-pill active" data-cvd="normal" title="Normal Trichromatic Vision">Normal</button>
+          <button class="cvd-pill" data-cvd="protan" title="Protanopia (Red-blind)">Protan</button>
+          <button class="cvd-pill" data-cvd="deutan" title="Deuteranopia (Green-blind)">Deutan</button>
+          <button class="cvd-pill" data-cvd="tritan" title="Tritanopia (Blue-blind)">Tritan</button>
+          <button class="cvd-pill" data-cvd="mono" title="Achromatopsia (Monochromacy)">Mono</button>
+        </div>
+      </div>
+
       <div class="palette" id="currentPalette">
         <div class="swatch" id="primarySwatch" data-role="primary">
-          <div class="swatch-color"></div>
+          <div class="swatch-color" title="Click to load into Harmony Studio"></div>
           <div class="swatch-info">
-            <span class="swatch-label">Primary</span>
+            <div class="swatch-label-row">
+              <span class="swatch-label">Primary</span>
+              <span class="swatch-badges"></span>
+            </div>
             <span class="swatch-value">--</span>
           </div>
-          <button class="icon-btn favorite-btn" title="Add to favorites">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-              </polygon>
+          <button class="icon-btn favorite-btn" title="Save to favorites">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </button>
-          <button class="icon-btn copy-btn" title="Copy">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="icon-btn copy-btn" title="Copy value">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
               <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
             </svg>
           </button>
         </div>
+
         <div class="swatch" id="baseSwatch" data-role="base">
-          <div class="swatch-color"></div>
+          <div class="swatch-color" title="Click to load into Harmony Studio"></div>
           <div class="swatch-info">
-            <span class="swatch-label">Base</span>
+            <div class="swatch-label-row">
+              <span class="swatch-label">Base</span>
+              <span class="swatch-badges"></span>
+            </div>
             <span class="swatch-value">--</span>
           </div>
-          <button class="icon-btn favorite-btn" title="Add to favorites">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-              </polygon>
+          <button class="icon-btn favorite-btn" title="Save to favorites">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </button>
-          <button class="icon-btn copy-btn" title="Copy">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="icon-btn copy-btn" title="Copy value">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
               <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
             </svg>
           </button>
         </div>
+
         <div class="swatch" id="accentSwatch" data-role="accent">
-          <div class="swatch-color"></div>
+          <div class="swatch-color" title="Click to load into Harmony Studio"></div>
           <div class="swatch-info">
-            <span class="swatch-label">Accent 1</span>
+            <div class="swatch-label-row">
+              <span class="swatch-label">Accent 1</span>
+              <span class="swatch-badges"></span>
+            </div>
             <span class="swatch-value">--</span>
           </div>
-          <button class="icon-btn favorite-btn" title="Add to favorites">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-              </polygon>
+          <button class="icon-btn favorite-btn" title="Save to favorites">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </button>
-          <button class="icon-btn copy-btn" title="Copy">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="icon-btn copy-btn" title="Copy value">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
               <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
             </svg>
           </button>
         </div>
+
         <div class="swatch" id="accent2Swatch" data-role="accent2">
-          <div class="swatch-color"></div>
+          <div class="swatch-color" title="Click to load into Harmony Studio"></div>
           <div class="swatch-info">
-            <span class="swatch-label">Accent 2</span>
+            <div class="swatch-label-row">
+              <span class="swatch-label">Accent 2</span>
+              <span class="swatch-badges"></span>
+            </div>
             <span class="swatch-value">--</span>
           </div>
-          <button class="icon-btn favorite-btn" title="Add to favorites">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-              </polygon>
+          <button class="icon-btn favorite-btn" title="Save to favorites">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </button>
-          <button class="icon-btn copy-btn" title="Copy">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="icon-btn copy-btn" title="Copy value">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
               <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
             </svg>
@@ -181,58 +218,75 @@
       </div>
     </section>
 
-    <!-- Complementary Generator -->
-    <section class="section">
+    <!-- Perceptual OKLCH Harmony Studio -->
+    <section class="section card-section">
       <div class="section-header">
-        <h2>Complementary</h2>
-        <div class="gen-input-group">
-          <input type="text" id="compInput" placeholder="#HEX, RGB or HSL" class="gen-input">
-          <button class="icon-btn" id="generateComp" title="Generate Trio">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-            </svg>
-          </button>
+        <h2>Harmony Studio</h2>
+        <div class="harmony-tabs" id="harmonyTabs">
+          <button class="harmony-tab active" data-harmony="split" title="Split-Complementary (0°, 180°, 150°, 210°)">Split</button>
+          <button class="harmony-tab" data-harmony="triad" title="Triadic Harmony (0°, 120°, 240° + Surface)">Triad</button>
+          <button class="harmony-tab" data-harmony="analog" title="Analogous Harmony (0°, -30°, +30°, +60°)">Analog</button>
+          <button class="harmony-tab" data-harmony="tonal" title="Perceptual OKLCH Tonal Scale (Shades & Tints)">Tonal</button>
         </div>
       </div>
+
+      <div class="harmony-input-row">
+        <label class="color-dot-picker" title="Choose base color">
+          <input type="color" id="compColorPicker" value="#00D4FF">
+          <span class="color-dot-preview" id="compDotPreview" style="background: #00D4FF;"></span>
+        </label>
+        <input type="text" id="compInput" placeholder="Enter #HEX, rgb(), hsl() or oklch()" class="gen-input">
+        <button class="btn-generate" id="generateComp" title="Generate OKLCH Harmony">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+          </svg>
+        </button>
+      </div>
+
       <div class="comp-results" id="compResults">
-        <div class="comp-swatch comp-base-swatch" id="compBase">
+        <div class="comp-swatch comp-base-swatch" id="compBase" title="Click to copy">
           <div class="swatch-color"></div>
           <div class="swatch-info">
             <span class="swatch-label">Base</span>
             <span class="swatch-value">--</span>
           </div>
-        </div>
-        <div class="comp-swatch" id="compTrue">
-          <div class="swatch-color"></div>
-          <div class="swatch-info">
-            <span class="swatch-label">Complement</span>
-            <span class="swatch-value">--</span>
-          </div>
-          <button class="icon-btn comp-fav-btn" title="Add to favorites">
+          <button class="icon-btn comp-fav-btn" title="Save to favorites">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </button>
         </div>
-        <div class="comp-swatch" id="compSplit1">
+        <div class="comp-swatch" id="compTrue" title="Click to copy">
+          <div class="swatch-color"></div>
+          <div class="swatch-info">
+            <span class="swatch-label">Comp</span>
+            <span class="swatch-value">--</span>
+          </div>
+          <button class="icon-btn comp-fav-btn" title="Save to favorites">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div class="comp-swatch" id="compSplit1" title="Click to copy">
           <div class="swatch-color"></div>
           <div class="swatch-info">
             <span class="swatch-label">Split 1</span>
             <span class="swatch-value">--</span>
           </div>
-          <button class="icon-btn comp-fav-btn" title="Add to favorites">
+          <button class="icon-btn comp-fav-btn" title="Save to favorites">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </button>
         </div>
-        <div class="comp-swatch" id="compSplit2">
+        <div class="comp-swatch" id="compSplit2" title="Click to copy">
           <div class="swatch-color"></div>
           <div class="swatch-info">
             <span class="swatch-label">Split 2</span>
             <span class="swatch-value">--</span>
           </div>
-          <button class="icon-btn comp-fav-btn" title="Add to favorites">
+          <button class="icon-btn comp-fav-btn" title="Save to favorites">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
@@ -242,10 +296,10 @@
     </section>
 
     <!-- Recent Colors -->
-    <section class="section">
+    <section class="section card-section">
       <div class="section-header">
-        <h2>Recent</h2>
-        <button class="icon-btn" id="clearRecent" title="Clear Recent">
+        <h2>Recent Picks</h2>
+        <button class="icon-btn danger-hover" id="clearRecent" title="Clear Recent">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"></polyline>
             <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
@@ -259,7 +313,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <a href="#" id="brandLinkPopup" class="brand-link">by Mellow Solutions</a>
+      <a href="#" id="brandLinkPopup" class="brand-link">Mellow Solutions · Perceptual Color Studio</a>
     </footer>
   </div>
   <script src="popup.js"></script>

@@ -1,19 +1,18 @@
-// ColorCheck Options Page Script
-// Manages settings, favorites gallery, and history
+// ColorCheck Options Page Script v3.0
+// Manages settings, OKLCH formatting, favorites gallery, CSS/JSON export, and history
 
 document.addEventListener('DOMContentLoaded', () => {
-    // External Links
     const COFFEE_URL = 'https://buymeacoffee.com/mellowsolutions';
     const LANDING_URL = 'https://mello2110.github.io/LandingpageMellowSolutions/';
     const MAX_FAVORITES = 50;
 
-    // DOM Elements
     const themeToggle = document.getElementById('themeToggle');
     const chromeShortcuts = document.getElementById('chromeShortcuts');
     const operaShortcuts = document.getElementById('operaShortcuts');
     const favoritesGrid = document.getElementById('favoritesGrid');
     const historyList = document.getElementById('historyList');
     const exportBtn = document.getElementById('exportFavorites');
+    const exportCssBtn = document.getElementById('exportCssBtn');
     const clearFavoritesBtn = document.getElementById('clearFavorites');
     const clearHistoryBtn = document.getElementById('clearHistory');
     const formatOptions = document.querySelectorAll('input[name="format"]');
@@ -22,7 +21,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentFormat = 'hex';
 
-    // Initialize
+    // OKLCH helper for legacy saved colors
+    function srgbToLinear(x) {
+        const v = x / 255;
+        return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    }
+
+    function hexToOklchString(hex) {
+        if (!hex || !hex.startsWith('#') || hex.length < 7) return hex;
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        const lr = srgbToLinear(r), lg = srgbToLinear(g), lb = srgbToLinear(b);
+        const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
+        const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb);
+        const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
+        const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
+        const a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+        const b_ = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+        const C = Math.sqrt(a * a + b_ * b_);
+        let h = (Math.atan2(b_, a) * 180) / Math.PI;
+        if (h < 0) h += 360;
+        return `oklch(${Math.round(L * 100)}% ${C.toFixed(3)} ${Math.round(C < 0.002 ? 0 : h)})`;
+    }
+
     init();
 
     async function init() {
@@ -57,31 +79,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!shortcut) {
             return '<span class="shortcut-not-set">Not set</span>';
         }
-        // Split by + and wrap each key in kbd
         const keys = shortcut.split('+').map(key => key.trim());
         return keys.map(key => `<kbd>${key}</kbd>`).join(' + ');
     }
 
     function setupEventListeners() {
-        // Theme toggle
         themeToggle.addEventListener('click', toggleTheme);
 
-        // Chrome shortcuts link - open in new tab
         chromeShortcuts.addEventListener('click', (e) => {
             e.preventDefault();
             chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
         });
 
-        // Opera shortcuts link - open in new tab
         operaShortcuts.addEventListener('click', (e) => {
             e.preventDefault();
             chrome.tabs.create({ url: 'opera://extensions/shortcuts' });
         });
 
-        // Export favorites
-        exportBtn.addEventListener('click', exportFavorites);
+        exportBtn.addEventListener('click', exportFavoritesJson);
+        if (exportCssBtn) exportCssBtn.addEventListener('click', exportFavoritesCss);
 
-        // Clear favorites
         clearFavoritesBtn.addEventListener('click', async () => {
             if (confirm('Clear all favorites?')) {
                 await chrome.storage.local.set({ favorites: [] });
@@ -90,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Clear history
         clearHistoryBtn.addEventListener('click', async () => {
             if (confirm('Clear color history?')) {
                 await chrome.storage.session.set({ colorHistory: [] });
@@ -99,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Format change
         formatOptions.forEach(option => {
             option.addEventListener('change', async () => {
                 currentFormat = option.value;
@@ -110,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // External links
         coffeeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             chrome.tabs.create({ url: COFFEE_URL });
@@ -121,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
             chrome.tabs.create({ url: LANDING_URL });
         });
 
-        // Brand logo link
         const brandLogoLink = document.getElementById('brandLogoLink');
         if (brandLogoLink) {
             brandLogoLink.addEventListener('click', (e) => {
@@ -130,8 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-
-    // === THEME ===
 
     async function loadTheme() {
         const result = await chrome.storage.local.get(['darkMode']);
@@ -148,10 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyTheme(isDark) {
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        updateThemeIcon(isDark);
-    }
-
-    function updateThemeIcon(isDark) {
         themeToggle.innerHTML = isDark
             ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
@@ -162,23 +169,17 @@ document.addEventListener('DOMContentLoaded', () => {
         </svg>`;
     }
 
-    // === FORMAT ===
-
     async function loadFormat() {
         const result = await chrome.storage.local.get(['defaultFormat']);
         currentFormat = result.defaultFormat || 'hex';
-
         formatOptions.forEach(option => {
             option.checked = option.value === currentFormat;
         });
     }
 
-    // === FAVORITES ===
-
     async function loadFavorites() {
         const result = await chrome.storage.local.get(['favorites']);
-        const favorites = result.favorites || [];
-        renderFavorites(favorites);
+        renderFavorites(result.favorites || []);
     }
 
     function renderFavorites(favorites) {
@@ -208,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `).join('');
 
-        // Event listeners for favorites
         favoritesGrid.querySelectorAll('.favorite-item').forEach(item => {
             const index = parseInt(item.dataset.index);
 
@@ -226,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('Removed from favorites');
             });
 
-            // Click on item to copy
             item.addEventListener('click', () => {
                 const value = getFormattedValue(favorites[index]);
                 copyToClipboard(value, favorites[index].hex);
@@ -234,10 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function exportFavorites() {
+    function exportFavoritesJson() {
         chrome.storage.local.get(['favorites'], (result) => {
             const favorites = result.favorites || [];
-
             if (favorites.length === 0) {
                 showToast('No favorites to export');
                 return;
@@ -246,38 +244,59 @@ document.addEventListener('DOMContentLoaded', () => {
             const exportData = favorites.map(c => ({
                 hex: c.hex,
                 rgb: c.rgb,
-                hsl: c.hsl
+                hsl: c.hsl,
+                oklch: c.oklch || hexToOklchString(c.hex)
             }));
 
             const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-
             const a = document.createElement('a');
             a.href = url;
             a.download = 'colorcheck-favorites.json';
             a.click();
-
             URL.revokeObjectURL(url);
-            showToast(`Exported ${favorites.length} colors`);
+            showToast(`Exported ${favorites.length} colors (JSON)`);
         });
     }
 
-    // === HISTORY ===
+    function exportFavoritesCss() {
+        chrome.storage.local.get(['favorites'], (result) => {
+            const favorites = result.favorites || [];
+            if (favorites.length === 0) {
+                showToast('No favorites to export');
+                return;
+            }
+
+            const lines = [':root {'];
+            favorites.forEach((c, idx) => {
+                lines.push(`  --cc-color-${idx + 1}: ${getFormattedValue(c)}; /* ${c.hex} */`);
+            });
+            lines.push('}');
+
+            const blob = new Blob([lines.join('\n')], { type: 'text/css' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'colorcheck-tokens.css';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported ${favorites.length} CSS tokens`);
+        });
+    }
 
     async function loadHistory() {
         const result = await chrome.storage.session.get(['colorHistory']);
-        const history = result.colorHistory || [];
-        renderHistory(history);
+        renderHistory(result.colorHistory || []);
     }
 
     function renderHistory(history) {
         if (history.length === 0) {
-            historyList.innerHTML = '<p class="empty-state">No colors in history. Use Alt+PageUp to pick colors.</p>';
+            historyList.innerHTML = '<p class="empty-state">No colors in history. Use Ctrl+Shift+E to pick colors.</p>';
             return;
         }
 
         historyList.innerHTML = history.slice(0, 12).map((color, index) => `
-      <div class="favorite-item history-item" data-index="${index}" data-hex="${color.hex}" data-rgb="${color.rgb}" data-hsl="${color.hsl}">
+      <div class="favorite-item history-item" data-index="${index}" data-hex="${color.hex}" data-rgb="${color.rgb}" data-hsl="${color.hsl}" data-oklch="${color.oklch || ''}">
         <div class="favorite-color" style="background: ${color.hex}"></div>
         <span class="favorite-value">${getFormattedValue(color)}</span>
         <div class="favorite-actions">
@@ -302,13 +321,13 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `).join('');
 
-        // Event listeners for history items
         historyList.querySelectorAll('.history-item').forEach(item => {
             const index = parseInt(item.dataset.index);
             const colorData = {
                 hex: item.dataset.hex,
                 rgb: item.dataset.rgb,
-                hsl: item.dataset.hsl
+                hsl: item.dataset.hsl,
+                oklch: item.dataset.oklch || hexToOklchString(item.dataset.hex)
             };
 
             item.querySelector('.copy-hist').addEventListener('click', (e) => {
@@ -319,13 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
             item.querySelector('.add-to-fav').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const result = await chrome.storage.local.get(['favorites']);
-                let favorites = result.favorites || [];
+                const favorites = result.favorites || [];
 
                 if (favorites.some(f => f.hex === colorData.hex)) {
                     showToast('Already in favorites');
                     return;
                 }
-
                 if (favorites.length >= MAX_FAVORITES) {
                     showToast(`Max ${MAX_FAVORITES} favorites! Delete one first.`);
                     return;
@@ -340,26 +358,24 @@ document.addEventListener('DOMContentLoaded', () => {
             item.querySelector('.remove-hist').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const result = await chrome.storage.session.get(['colorHistory']);
-                let historyData = result.colorHistory || [];
+                const historyData = result.colorHistory || [];
                 historyData.splice(index, 1);
                 await chrome.storage.session.set({ colorHistory: historyData });
                 renderHistory(historyData);
                 showToast('Removed from history');
             });
 
-            // Click on item to copy
             item.addEventListener('click', () => {
                 copyToClipboard(getFormattedValue(colorData), colorData.hex);
             });
         });
     }
 
-    // === UTILITIES ===
-
     function getFormattedValue(colorData) {
         switch (currentFormat) {
             case 'rgb': return colorData.rgb;
             case 'hsl': return colorData.hsl;
+            case 'oklch': return colorData.oklch || hexToOklchString(colorData.hex);
             default: return colorData.hex;
         }
     }
@@ -371,9 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showToast(message, color) {
-        // Remove existing toasts
         document.querySelectorAll('.toast').forEach(t => t.remove());
-
         const toast = document.createElement('div');
         toast.className = 'toast';
 
@@ -386,8 +400,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2000);
     }
-
-    // === STORAGE LISTENER ===
 
     chrome.storage.onChanged.addListener((changes, namespace) => {
         if (namespace === 'local' && changes.favorites) {
