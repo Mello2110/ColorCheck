@@ -21,7 +21,7 @@ architectureHighlights:
   - "Client-side Daltonization matrix transformations for Protan, Deutan, Tritan, and Mono previews"
   - "Proportional 60-30-10 palette clustering with instant CSS Variables & Tailwind configuration export"
 links:
-  chromeWebStore: ""
+  chromeWebStore: "https://chromewebstore.google.com/detail/colorcheck/imikgfjdmlolmahfaigjmdlkhjpobhpe?authuser=0&hl=de"
   demoUrl: ""
   githubUrl: "https://github.com/Mello2110/ColorCheck"
 sandbox:
